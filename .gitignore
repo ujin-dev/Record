@@ -1,0 +1,96 @@
+# Built application files
+*.apk
+*.aab
+*.ap_
+
+# Files for the ART/Dalvik VM
+*.dex
+
+# Java/Kotlin compiled files
+*.class
+
+# Generated files
+bin/
+gen/
+out/
+build/
+captures/
+
+# Gradle
+.gradle/
+local.properties
+.gradle-cache/
+
+# Android Studio / IntelliJ
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Keystore files
+*.jks
+*.keystore
+
+# External native build
+.externalNativeBuild/
+.cxx/
+
+# Google Services
+google-services.json
+
+# Firebase Crashlytics
+com_crashlytics_export_strings.xml
+
+# Navigation Safe Args
+.navigation/
+
+# KSP / KAPT
+.ksp/
+kapt/
+
+# Compose
+compose_compiler/
+
+# NDK
+obj/
+
+# Log files
+*.log
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.swp
+
+# Mac/Linux hidden files
+*.orig
+
+# Secrets / env
+.env
+.env.*
+secret.properties
+
+# Test outputs
+test-output/
+coverage/
+jacoco/
+
+# Fastlane
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots/
+fastlane/test_output/
+
+# Kotlin Multiplatform (optional)
+shared/build/
+
+# VSCode
+.vscode/
+
+# Node modules (if React Native or tooling added later)
+node_modules/
