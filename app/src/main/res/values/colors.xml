@@ -1,3 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="parchment95">#F4F1EC</color>
+    <color name="parchment92">#F3EEE8</color>
+    <color name="carbon_black">#1F1B18</color>
+    <color name="black">#000000</color>
+
+    <color name="ic_launcher_background_tint">@color/parchment95</color>
+    <color name="ic_launcher_foreground_tint">@color/black</color>
 </resources>
