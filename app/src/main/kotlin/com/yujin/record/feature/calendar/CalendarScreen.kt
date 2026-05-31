@@ -26,7 +26,8 @@ import java.time.format.DateTimeFormatter
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CalendarScreen(
-    viewModel: CalendarViewModel = viewModel()
+    viewModel: CalendarViewModel = viewModel(),
+    onCreateReviewClick: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -37,7 +38,7 @@ fun CalendarScreen(
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = viewModel::onCreateReviewClick,
+                onClick = onCreateReviewClick,
             ) {
                 Icon(Icons.Default.Add, contentDescription = null)
             }
@@ -61,6 +62,8 @@ fun CalendarScreen(
 @Composable
 fun CalendarScreenPreview() {
     RecordTheme {
-        CalendarScreen()
+        CalendarScreen(
+            onCreateReviewClick = {}
+        )
     }
 }

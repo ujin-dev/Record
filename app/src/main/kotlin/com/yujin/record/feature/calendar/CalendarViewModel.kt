@@ -35,10 +35,6 @@ class CalendarViewModel : ViewModel() {
         }
     }
 
-    fun onCreateReviewClick() {
-        // TODO
-    }
-
     fun loadMonth(month: YearMonth) {
         _uiState.update { state ->
             state.copy(
