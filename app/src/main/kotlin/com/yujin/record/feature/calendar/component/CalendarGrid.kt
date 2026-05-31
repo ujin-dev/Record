@@ -1,4 +1,4 @@
-package com.yujin.record.feature.home.component
+package com.yujin.record.feature.calendar.component
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -6,7 +6,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.yujin.record.feature.home.CalendarDayUiState
+import com.yujin.record.feature.calendar.CalendarDayUiState
 import java.time.LocalDate
 
 @Composable

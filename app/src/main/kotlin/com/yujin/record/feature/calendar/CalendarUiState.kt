@@ -1,10 +1,10 @@
-package com.yujin.record.feature.home
+package com.yujin.record.feature.calendar
 
 import com.yujin.record.model.Review
 import java.time.LocalDate
 import java.time.YearMonth
 
-data class HomeUiState(
+data class CalendarUiState(
     val month: YearMonth = YearMonth.now(),
     val selectedDate: LocalDate = LocalDate.now(),
     val calendarDays: List<CalendarDayUiState> = emptyList(),

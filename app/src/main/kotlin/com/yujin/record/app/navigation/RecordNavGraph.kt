@@ -6,7 +6,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.yujin.record.feature.home.HomeScreen
+import com.yujin.record.feature.calendar.CalendarScreen
 
 @Composable
 fun RecordNavGraph(
@@ -18,7 +18,7 @@ fun RecordNavGraph(
         modifier = Modifier.fillMaxSize()
     ) {
         composable(route = RecordRoute.Home.route) {
-            HomeScreen()
+            CalendarScreen()
         }
     }
 }

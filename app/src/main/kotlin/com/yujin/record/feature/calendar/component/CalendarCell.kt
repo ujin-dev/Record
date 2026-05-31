@@ -1,4 +1,4 @@
-package com.yujin.record.feature.home.component
+package com.yujin.record.feature.calendar.component
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box

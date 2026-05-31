@@ -1,4 +1,4 @@
-package com.yujin.record.feature.home
+package com.yujin.record.feature.calendar
 
 import androidx.lifecycle.ViewModel
 import com.yujin.record.model.Review
@@ -10,9 +10,9 @@ import java.time.LocalDate
 import java.time.YearMonth
 import kotlin.math.ceil
 
-class HomeViewModel : ViewModel() {
-    private val _uiState = MutableStateFlow(HomeUiState())
-    val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
+class CalendarViewModel : ViewModel() {
+    private val _uiState = MutableStateFlow(CalendarUiState())
+    val uiState: StateFlow<CalendarUiState> = _uiState.asStateFlow()
 
     init {
         loadMonth(YearMonth.now())

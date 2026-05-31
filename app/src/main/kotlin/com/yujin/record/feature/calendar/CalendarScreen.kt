@@ -1,6 +1,5 @@
-package com.yujin.record.feature.home
+package com.yujin.record.feature.calendar
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,20 +15,19 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.yujin.record.core.ui.preview.DefaultScreenPreviews
 import com.yujin.record.core.ui.theme.RecordTheme
-import com.yujin.record.feature.home.component.CalendarGrid
-import com.yujin.record.feature.home.component.WeekDayRow
+import com.yujin.record.feature.calendar.component.CalendarGrid
+import com.yujin.record.feature.calendar.component.WeekDayRow
 import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(
+fun CalendarScreen(
     modifier: Modifier = Modifier,
-    viewModel: HomeViewModel = viewModel()
+    viewModel: CalendarViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -62,8 +60,8 @@ fun HomeScreen(
 
 @DefaultScreenPreviews
 @Composable
-fun HomeScreenPreview() {
+fun CalendarScreenPreview() {
     RecordTheme {
-        HomeScreen()
+        CalendarScreen()
     }
 }
