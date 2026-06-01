@@ -1,11 +1,10 @@
 package com.yujin.record.app.navigation
 
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.toRoute
 import com.yujin.record.feature.calendar.CalendarScreen
 import com.yujin.record.feature.review.edit.ReviewEditScreen
 
@@ -15,19 +14,28 @@ fun RecordNavGraph(
 ) {
     NavHost(
         navController = navController,
-        startDestination = RecordRoute.Home.route,
-        modifier = Modifier.fillMaxSize()
+        startDestination = RecordRoute.Calendar,
     ) {
-        composable(route = RecordRoute.Home.route) {
+        composable<RecordRoute.Calendar> {
             CalendarScreen(
                 onCreateReviewClick = {
-                    navController.navigate(RecordRoute.ReviewEdit.route)
+                    navController.navigate(route = RecordRoute.ReviewCreate)
                 }
             )
         }
 
-        composable(route = RecordRoute.ReviewEdit.route) {
+        composable<RecordRoute.ReviewCreate> {
             ReviewEditScreen(
+                onBackClick = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable<RecordRoute.ReviewEdit> { backStackEntry ->
+            val review: RecordRoute.ReviewEdit = backStackEntry.toRoute()
+            ReviewEditScreen(
+                reviewId = review.reviewId,
                 onBackClick = {
                     navController.popBackStack()
                 }
