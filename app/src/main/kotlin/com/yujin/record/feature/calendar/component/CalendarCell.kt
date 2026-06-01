@@ -8,7 +8,7 @@ import androidx.compose.ui.Alignment.Companion.BottomEnd
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
 import com.yujin.record.R
-import com.yujin.record.core.ui.preview.DefaultViewPreviews
+import com.yujin.record.core.ui.preview.DefaultComponentPreviews
 import com.yujin.record.core.ui.theme.RecordTheme
 import java.time.LocalDate
 import java.time.temporal.ChronoField
@@ -34,7 +34,7 @@ fun CalendarCell(
     }
 }
 
-@DefaultViewPreviews
+@DefaultComponentPreviews
 @Composable
 fun CalendarCellPreview() {
     RecordTheme {

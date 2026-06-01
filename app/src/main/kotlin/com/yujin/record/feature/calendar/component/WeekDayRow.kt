@@ -6,7 +6,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
-import com.yujin.record.core.ui.preview.DefaultViewPreviews
+import com.yujin.record.core.ui.preview.DefaultComponentPreviews
 import com.yujin.record.core.ui.theme.RecordTheme
 
 @Composable
@@ -23,7 +23,7 @@ fun WeekDayRow() {
     }
 }
 
-@DefaultViewPreviews
+@DefaultComponentPreviews
 @Composable
 fun DayRowPreview() {
     RecordTheme {

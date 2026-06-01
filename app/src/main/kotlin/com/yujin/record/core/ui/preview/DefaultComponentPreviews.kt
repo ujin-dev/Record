@@ -13,4 +13,4 @@ import androidx.compose.ui.tooling.preview.Preview
     name = "dark",
     showBackground = true,
 )
-annotation class DefaultViewPreviews
+annotation class DefaultComponentPreviews
