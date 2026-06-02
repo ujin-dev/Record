@@ -16,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.yujin.record.core.ui.preview.DefaultScreenPreviews
 import com.yujin.record.core.ui.theme.RecordTheme
@@ -29,7 +30,7 @@ fun CalendarScreen(
     viewModel: CalendarViewModel = viewModel(),
     onCreateReviewClick: () -> Unit
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
