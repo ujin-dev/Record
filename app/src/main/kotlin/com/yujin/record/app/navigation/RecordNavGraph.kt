@@ -6,6 +6,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import com.yujin.record.feature.calendar.CalendarScreen
+import com.yujin.record.feature.review.edit.ReviewEditRoute
 import com.yujin.record.feature.review.edit.ReviewEditScreen
 
 @Composable
@@ -25,20 +26,16 @@ fun RecordNavGraph(
         }
 
         composable<RecordRoute.ReviewCreate> {
-            ReviewEditScreen(
-                onBackClick = {
-                    navController.popBackStack()
-                }
+            ReviewEditRoute(
+                onBackClick = navController::popBackStack
             )
         }
 
         composable<RecordRoute.ReviewEdit> { backStackEntry ->
             val review: RecordRoute.ReviewEdit = backStackEntry.toRoute()
-            ReviewEditScreen(
+            ReviewEditRoute(
                 reviewId = review.reviewId,
-                onBackClick = {
-                    navController.popBackStack()
-                }
+                onBackClick = navController::popBackStack,
             )
         }
     }
