@@ -2,7 +2,7 @@ package com.yujin.record.feature.review.edit
 
 import android.net.Uri
 import androidx.lifecycle.ViewModel
-import com.yujin.record.model.ReviewType
+import com.yujin.record.core.model.ReviewType
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

@@ -1,7 +1,7 @@
 package com.yujin.record.feature.calendar
 
 import androidx.lifecycle.ViewModel
-import com.yujin.record.model.Review
+import com.yujin.record.core.model.Review
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

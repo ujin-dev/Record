@@ -1,7 +1,7 @@
 package com.yujin.record.feature.review.edit
 
 import android.net.Uri
-import com.yujin.record.model.ReviewType
+import com.yujin.record.core.model.ReviewType
 
 data class ReviewEditUiState(
     val title: String = "",

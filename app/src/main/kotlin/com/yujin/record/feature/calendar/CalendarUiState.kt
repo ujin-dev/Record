@@ -1,6 +1,6 @@
 package com.yujin.record.feature.calendar
 
-import com.yujin.record.model.Review
+import com.yujin.record.core.model.Review
 import java.time.LocalDate
 import java.time.YearMonth
 

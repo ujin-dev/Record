@@ -39,7 +39,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.yujin.record.core.ui.preview.DefaultScreenPreviews
 import com.yujin.record.core.ui.theme.RecordTheme
-import com.yujin.record.model.ReviewType
+import com.yujin.record.core.model.ReviewType
 
 private val reviewTypeOptions = listOf(ReviewType.MOVIE, ReviewType.BOOK)
 

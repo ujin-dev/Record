@@ -1,6 +1,6 @@
 package com.yujin.record.feature.review.edit
 
-import com.yujin.record.model.ReviewType
+import com.yujin.record.core.model.ReviewType
 
 sealed interface ReviewEditAction {
     data object SaveClicked : ReviewEditAction
