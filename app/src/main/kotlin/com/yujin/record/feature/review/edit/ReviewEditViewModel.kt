@@ -2,48 +2,79 @@ package com.yujin.record.feature.review.edit
 
 import android.net.Uri
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
+import com.yujin.record.core.data.repository.ReviewRepository
+import com.yujin.record.core.model.ImageItem
 import com.yujin.record.core.model.ReviewType
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
-class ReviewEditViewModel : ViewModel() {
+class ReviewEditViewModel(
+    private val reviewRepository: ReviewRepository,
+) : ViewModel() {
     private val _uiState = MutableStateFlow(ReviewEditUiState())
     val uiState: StateFlow<ReviewEditUiState> = _uiState.asStateFlow()
 
+    private val _uiEvent = MutableSharedFlow<ReviewEditUiEvent>()
+    val uiEvent = _uiEvent.asSharedFlow()
+
     private var currentReviewId: Long? = null
 
+    companion object {
+        fun factory(reviewRepository: ReviewRepository): ViewModelProvider.Factory =
+            viewModelFactory {
+                initializer { ReviewEditViewModel(reviewRepository) }
+            }
+    }
+
     fun initialize(reviewId: Long?) {
-        if (reviewId != null && reviewId != currentReviewId) {
+        if (reviewId != currentReviewId) {
             currentReviewId = reviewId
-            loadReview(reviewId)
+            reviewId?.let { loadReview(reviewId) }
         }
     }
 
     private fun loadReview(reviewId: Long) {}
 
-    fun onAction(action: ReviewEditAction) {
+    fun onAction(action: ReviewEditUiAction) {
         when (action) {
-            is ReviewEditAction.TitleChanged -> onTitleChanged(action.title)
-            is ReviewEditAction.TypeChanged -> onReviewTypeChanged(action.type)
-            is ReviewEditAction.CreatorNameChanged -> onCreatorNameChanged(action.creatorName)
-            is ReviewEditAction.ContentChanged -> onContentChanged(action.content)
-            is ReviewEditAction.ShortReviewChanged -> onShortReviewChanged(action.shortReview)
+            is ReviewEditUiAction.TitleChanged -> onTitleChanged(action.title)
+            is ReviewEditUiAction.TypeChanged -> onReviewTypeChanged(action.type)
+            is ReviewEditUiAction.CreatorNameChanged -> onCreatorNameChanged(action.creatorName)
+            is ReviewEditUiAction.ContentChanged -> onContentChanged(action.content)
+            is ReviewEditUiAction.ShortReviewChanged -> onShortReviewChanged(action.shortReview)
 
-            is ReviewEditAction.RatingChanged -> onRatingChanged(action.rating)
+            is ReviewEditUiAction.RatingChanged -> onRatingChanged(action.rating)
 
-            is ReviewEditAction.TagChanged -> onTagChanged(action.tag)
-            is ReviewEditAction.TagAdded -> onTagAdded(action.tag)
-            is ReviewEditAction.TagRemoved -> onTagRemoved(action.tag)
+            is ReviewEditUiAction.TagChanged -> onTagChanged(action.tag)
+            is ReviewEditUiAction.TagAdded -> onTagAdded(action.tag)
+            is ReviewEditUiAction.TagRemoved -> onTagRemoved(action.tag)
 
-            ReviewEditAction.SaveClicked -> saveReview()
-            ReviewEditAction.ImagePickerClicked -> openImagePicker()
-            ReviewEditAction.BookmarkSelectorClicked -> openBookmarkSelector()
+            ReviewEditUiAction.SaveClicked -> saveReview()
+            ReviewEditUiAction.ImagePickerClicked -> openImagePicker()
+            ReviewEditUiAction.BookmarkSelectorClicked -> openBookmarkSelector()
         }
     }
 
-    private fun saveReview() {}
+    private fun saveReview() {
+        viewModelScope.launch {
+            reviewRepository.createReview(_uiState.value.toReview())
+                .onSuccess { id ->
+                    _uiEvent.emit(ReviewEditUiEvent.NavigateToDetail(id))
+                }
+                .onFailure { e ->
+                    _uiEvent.emit(ReviewEditUiEvent.ShowToast("저장에 실패했습니다."))
+                }
+        }
+    }
 
     private fun deleteReview() {}
 

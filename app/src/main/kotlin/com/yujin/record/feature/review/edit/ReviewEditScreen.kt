@@ -48,7 +48,7 @@ private val reviewTypeOptions = listOf(ReviewType.MOVIE, ReviewType.BOOK)
 fun ReviewEditScreen(
     uiState: ReviewEditUiState,
     onBackClick: () -> Unit = {},
-    onAction: (ReviewEditAction) -> Unit,
+    onAction: (ReviewEditUiAction) -> Unit,
 ) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -65,7 +65,7 @@ fun ReviewEditScreen(
                 },
                 actions = {
                     IconButton(
-                        onClick = { onAction(ReviewEditAction.ImagePickerClicked) },
+                        onClick = { onAction(ReviewEditUiAction.ImagePickerClicked) },
                         enabled = true,
                     ) {
                         Icon(
@@ -75,7 +75,7 @@ fun ReviewEditScreen(
                     }
 
                     IconButton(
-                        onClick = { onAction(ReviewEditAction.BookmarkSelectorClicked) },
+                        onClick = { onAction(ReviewEditUiAction.BookmarkSelectorClicked) },
                         enabled = true,
                     ) {
                         Icon(
@@ -85,7 +85,7 @@ fun ReviewEditScreen(
                     }
 
                     IconButton(
-                        onClick = { onAction(ReviewEditAction.SaveClicked) },
+                        onClick = { onAction(ReviewEditUiAction.SaveClicked) },
                         enabled = true,
                     ) {
                         Icon(
@@ -112,7 +112,7 @@ fun ReviewEditScreen(
                             index = index,
                             count = reviewTypeOptions.size
                         ),
-                        onClick = { onAction(ReviewEditAction.TypeChanged(reviewType)) },
+                        onClick = { onAction(ReviewEditUiAction.TypeChanged(reviewType)) },
                         selected = reviewType == uiState.type,
                         label = { Text(text = reviewType.displayName) }
                     )
@@ -122,7 +122,7 @@ fun ReviewEditScreen(
             // title
             OutlinedTextField(
                 value = uiState.title,
-                onValueChange = { onAction(ReviewEditAction.TitleChanged(it)) },
+                onValueChange = { onAction(ReviewEditUiAction.TitleChanged(it)) },
                 modifier = Modifier.fillMaxWidth(),
                 label = { Text(text = "제목") },
                 singleLine = true,
@@ -131,7 +131,7 @@ fun ReviewEditScreen(
             // creator
             OutlinedTextField(
                 value = uiState.creatorName,
-                onValueChange = { onAction(ReviewEditAction.CreatorNameChanged(it)) },
+                onValueChange = { onAction(ReviewEditUiAction.CreatorNameChanged(it)) },
                 modifier = Modifier.fillMaxWidth(),
                 label = {
                     Text(if (uiState.type == ReviewType.MOVIE) "감독" else "저자")
@@ -142,7 +142,7 @@ fun ReviewEditScreen(
             // content
             OutlinedTextField(
                 value = uiState.content,
-                onValueChange = { onAction(ReviewEditAction.ContentChanged(it)) },
+                onValueChange = { onAction(ReviewEditUiAction.ContentChanged(it)) },
                 label = { Text("상세 리뷰") },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -152,7 +152,7 @@ fun ReviewEditScreen(
             // short review
             OutlinedTextField(
                 value = uiState.shortReview,
-                onValueChange = { onAction(ReviewEditAction.ShortReviewChanged(it)) },
+                onValueChange = { onAction(ReviewEditUiAction.ShortReviewChanged(it)) },
                 modifier = Modifier.fillMaxWidth(),
                 label = {
                     Text("한줄평")
@@ -164,7 +164,7 @@ fun ReviewEditScreen(
             // improvement : https://developer.android.com/develop/ui/compose/touch-input/scroll/scroll-modifiers#scrollable-modifier
             Row {
                 repeat(5) { index ->
-                    IconButton(onClick = { onAction(ReviewEditAction.RatingChanged((index + 1).toFloat())) }) {
+                    IconButton(onClick = { onAction(ReviewEditUiAction.RatingChanged((index + 1).toFloat())) }) {
                         Icon(
                             imageVector = if (index < uiState.rating) Icons.Default.Star else Icons.Default.StarBorder,
                             tint = MaterialTheme.colorScheme.primary,
@@ -191,7 +191,7 @@ fun ReviewEditScreen(
                                 modifier = Modifier
                                     .size(InputChipDefaults.IconSize)
                                     .clickable {
-                                        onAction(ReviewEditAction.TagRemoved(tag))
+                                        onAction(ReviewEditUiAction.TagRemoved(tag))
                                     }
                             )
                         },
@@ -202,12 +202,12 @@ fun ReviewEditScreen(
 
                 OutlinedTextField(
                     value = uiState.tagInput,
-                    onValueChange = { onAction(ReviewEditAction.TagChanged(it)) },
+                    onValueChange = { onAction(ReviewEditUiAction.TagChanged(it)) },
                     placeholder = { Text("태그 입력") },
                     singleLine = true,
                     trailingIcon = {
                         IconButton(onClick = {
-                            onAction(ReviewEditAction.TagAdded(uiState.tagInput))
+                            onAction(ReviewEditUiAction.TagAdded(uiState.tagInput))
                         }) {
                             Icon(
                                 imageVector = Icons.Default.AddCircleOutline,

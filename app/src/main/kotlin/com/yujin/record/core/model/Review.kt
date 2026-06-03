@@ -1,15 +1,23 @@
 package com.yujin.record.core.model
 
-import com.yujin.record.feature.review.edit.ImageItem
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
+@OptIn(ExperimentalTime::class)
 data class Review(
     val id: Long,
+
     val title: String,
-    val creatorName: String,
-    val shortReview: String,
-    val content: String,
+    val creatorName: String = "",
+    val shortReview: String = "",
+    val content: String = "",
     val reviewType: ReviewType,
-    val images: List<ImageItem>,
-    val tags: List<String>,
     val rating: Float,
+
+    val images: List<ImageItem> = emptyList(),
+    val tags: List<String> = emptyList(),
+    val bookmarkId: Long = 0,
+
+    val createdAt: Instant,
+    val updatedAt: Instant,
 )

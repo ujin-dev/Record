@@ -5,9 +5,10 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
+import com.yujin.record.app.RecordApplication
 import com.yujin.record.feature.calendar.CalendarScreen
+import com.yujin.record.feature.review.detail.ReviewDetailRoute
 import com.yujin.record.feature.review.edit.ReviewEditRoute
-import com.yujin.record.feature.review.edit.ReviewEditScreen
 
 @Composable
 fun RecordNavGraph(
@@ -27,7 +28,11 @@ fun RecordNavGraph(
 
         composable<RecordRoute.ReviewCreate> {
             ReviewEditRoute(
-                onBackClick = navController::popBackStack
+                onBackClick = navController::popBackStack,
+                onNavigateToDetail = { id ->
+                    navController.navigate(route = RecordRoute.ReviewDetail(id))
+                },
+                reviewRepository = (navController.context.applicationContext as RecordApplication).reviewRepository,
             )
         }
 
@@ -36,7 +41,21 @@ fun RecordNavGraph(
             ReviewEditRoute(
                 reviewId = review.reviewId,
                 onBackClick = navController::popBackStack,
+                onNavigateToDetail = { id ->
+                    navController.navigate(route = RecordRoute.ReviewDetail(id))
+                },
+                reviewRepository = (navController.context.applicationContext as RecordApplication).reviewRepository,
+            )
+        }
+
+        composable<RecordRoute.ReviewDetail> { backStackEntry ->
+            val review: RecordRoute.ReviewDetail = backStackEntry.toRoute()
+            ReviewDetailRoute(
+                reviewId = review.reviewId,
+                onBackClick = navController::popBackStack,
+                reviewRepository = (navController.context.applicationContext as RecordApplication).reviewRepository,
             )
         }
     }
 }
+
