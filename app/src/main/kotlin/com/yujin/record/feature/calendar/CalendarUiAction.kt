@@ -1,10 +1,8 @@
 package com.yujin.record.feature.calendar
 
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.YearMonth
 
 sealed interface CalendarUiAction {
-    data class MonthChanged(val month: YearMonth) : CalendarUiAction
     data object PreviousMonthClicked : CalendarUiAction
     data object NextMonthClicked : CalendarUiAction
 

@@ -57,6 +57,7 @@ fun CalendarScreen(
 
             CalendarGrid(
                 days = uiState.calendarDays,
+                selectedDate = uiState.selectedDate,
                 onDateClick = { date -> onAction(CalendarUiAction.DateClicked(date)) }
             )
 

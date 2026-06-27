@@ -7,13 +7,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment.Companion.BottomEnd
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
-import kotlinx.datetime.LocalDate
+import androidx.compose.ui.text.font.FontWeight
+import com.yujin.record.feature.calendar.CalendarCellUiState
 
 @Composable
 fun CalendarCell(
     modifier: Modifier = Modifier,
-    day: LocalDate,
-    reviewCount: Int = 0,
+    state: CalendarCellUiState.Active,
+    selected: Boolean = false,
     imageResId: Int? = null,
     onClick: () -> Unit = {}
 ) {
@@ -22,10 +23,14 @@ fun CalendarCell(
             ReviewThumbnail(resId = imageResId)
         }
 
-        Text(text = day.day.toString(), modifier = Modifier.align(Center))
+        Text(
+            text = state.date.day.toString(),
+            modifier = Modifier.align(Center),
+            fontWeight = if (selected) FontWeight.ExtraBold else FontWeight.Normal,
+        )
 
-        if (reviewCount > 1) {
-            Text(text = "+${reviewCount - 1}", modifier = Modifier.align(BottomEnd))
+        if (state.reviewCount > 0) {
+            Text(text = "${state.reviewCount}", modifier = Modifier.align(BottomEnd))
         }
     }
 }

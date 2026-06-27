@@ -7,13 +7,16 @@ import kotlinx.datetime.YearMonth
 data class CalendarUiState(
     val month: YearMonth,
     val selectedDate: LocalDate,
-    val calendarDays: List<CalendarDayUiState> = emptyList(),
+    val calendarDays: List<CalendarCellUiState> = emptyList(),
     val reviews: List<Review> = emptyList()
 )
 
-data class CalendarDayUiState(
-    val date: LocalDate,
-    val isSelected: Boolean = false,
-    val reviewCount: Int,
-    val thumbnailUrl: String?
-)
+sealed interface CalendarCellUiState {
+    data class Active(
+        val date: LocalDate,
+        val reviewCount: Int,
+        val thumbnailUrl: String?,
+    ) : CalendarCellUiState
+
+    data object Empty : CalendarCellUiState
+}

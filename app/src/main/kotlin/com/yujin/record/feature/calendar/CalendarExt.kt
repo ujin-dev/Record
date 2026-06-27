@@ -7,3 +7,5 @@ import kotlinx.datetime.number
 fun YearMonth.firstDay(): LocalDate = LocalDate(year, month, 1)
 
 fun YearMonth.toDisplayString(): String = "%04d.%02d".format(year, month.number)
+
+fun LocalDate.toYearMonth(): YearMonth = YearMonth(year, month)
