@@ -7,7 +7,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.yujin.record.feature.calendar.CalendarDayUiState
-import java.time.LocalDate
+import kotlinx.datetime.LocalDate
 
 @Composable
 fun CalendarGrid(

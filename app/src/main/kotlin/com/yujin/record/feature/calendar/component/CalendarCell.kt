@@ -7,11 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment.Companion.BottomEnd
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
-import com.yujin.record.R
-import com.yujin.record.core.ui.preview.DefaultComponentPreviews
-import com.yujin.record.core.ui.theme.RecordTheme
-import java.time.LocalDate
-import java.time.temporal.ChronoField
+import kotlinx.datetime.LocalDate
 
 @Composable
 fun CalendarCell(
@@ -26,22 +22,10 @@ fun CalendarCell(
             ReviewThumbnail(resId = imageResId)
         }
 
-        Text(text = day.get(ChronoField.DAY_OF_MONTH).toString(), modifier = Modifier.align(Center))
+        Text(text = day.day.toString(), modifier = Modifier.align(Center))
 
         if (reviewCount > 1) {
             Text(text = "+${reviewCount - 1}", modifier = Modifier.align(BottomEnd))
         }
-    }
-}
-
-@DefaultComponentPreviews
-@Composable
-fun CalendarCellPreview() {
-    RecordTheme {
-        CalendarCell(
-            day = LocalDate.now(),
-            reviewCount = 3,
-            imageResId = R.drawable.movie_thumb_prada2
-        )
     }
 }

@@ -5,9 +5,15 @@ import com.yujin.record.core.data.mapper.toEntity
 import com.yujin.record.core.data.mapper.toReview
 import com.yujin.record.core.database.dao.ImageDao
 import com.yujin.record.core.database.dao.ReviewDao
+import com.yujin.record.core.database.model.ReviewWithImages
 import com.yujin.record.core.model.Review
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
+import kotlinx.datetime.DatePeriod
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.YearMonth
+import kotlinx.datetime.atStartOfDayIn
+import kotlinx.datetime.plus
+import kotlinx.datetime.toKotlinTimeZone
+import java.time.ZoneId
 import kotlin.time.Clock
 
 class ReviewRepositoryImpl(
@@ -47,5 +53,20 @@ class ReviewRepositoryImpl(
 
     override suspend fun getReviewById(id: Long): Review? {
         return reviewDao.getById(id)?.toReview()
+    }
+
+    override suspend fun getReviewsByDate(date: LocalDate): List<ReviewWithImages> {
+        val zoneId = ZoneId.systemDefault()
+        val start = date.atStartOfDayIn(zoneId.toKotlinTimeZone())
+        val end = date.plus(period = DatePeriod(days = 1)).atStartOfDayIn(zoneId.toKotlinTimeZone())
+        return reviewDao.getByDateRange(start, end)
+    }
+
+    override suspend fun getReviewsByMonth(month: YearMonth): List<ReviewWithImages> {
+        val zoneId = ZoneId.systemDefault()
+        val start = month.firstDay.atStartOfDayIn(zoneId.toKotlinTimeZone())
+        val end = month.lastDay.plus(period = DatePeriod(days = 1))
+            .atStartOfDayIn(zoneId.toKotlinTimeZone())
+        return reviewDao.getByDateRange(start, end)
     }
 }

@@ -1,45 +1,48 @@
 package com.yujin.record.feature.calendar
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.yujin.record.core.ui.preview.DefaultScreenPreviews
-import com.yujin.record.core.ui.theme.RecordTheme
+import androidx.compose.ui.unit.dp
 import com.yujin.record.feature.calendar.component.CalendarGrid
 import com.yujin.record.feature.calendar.component.WeekDayRow
-import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CalendarScreen(
-    viewModel: CalendarViewModel = viewModel(),
-    onCreateReviewClick: () -> Unit
+    uiState: CalendarUiState,
+    onAction: (CalendarUiAction) -> Unit,
 ) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
-            TopAppBar(title = { Text(text = uiState.month.format(DateTimeFormatter.ofPattern("yyyy.MM"))) })
+            TopAppBar(title = {
+                Text(text = uiState.month.toDisplayString())
+            })
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = onCreateReviewClick,
+                onClick = { onAction(CalendarUiAction.CreateReviewClicked) },
             ) {
                 Icon(Icons.Default.Add, contentDescription = null)
             }
@@ -51,20 +54,42 @@ fun CalendarScreen(
                 .fillMaxWidth()
         ) {
             WeekDayRow()
+
             CalendarGrid(
                 days = uiState.calendarDays,
-                onDateClick = viewModel::onDateClick
+                onDateClick = { date -> onAction(CalendarUiAction.DateClicked(date)) }
             )
-        }
-    }
-}
 
-@DefaultScreenPreviews
-@Composable
-fun CalendarScreenPreview() {
-    RecordTheme {
-        CalendarScreen(
-            onCreateReviewClick = {}
-        )
+            HorizontalDivider()
+
+            LazyColumn {
+                items(uiState.reviews) { review ->
+                    ListItem(
+                        modifier = Modifier.clickable(onClick = {
+                            onAction(
+                                CalendarUiAction.ReviewClicked(
+                                    review.id
+                                )
+                            )
+                        }),
+                        headlineContent = { Text(review.title) },
+                        supportingContent = {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(
+                                    imageVector = Icons.Default.Star,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(18.dp),
+                                )
+                                Text(text = review.rating.toString())
+                                if (review.shortReview.isNotEmpty()) {
+                                    Text(text = " · ")
+                                    Text(text = review.shortReview)
+                                }
+                            }
+                        },
+                    )
+                }
+            }
+        }
     }
 }

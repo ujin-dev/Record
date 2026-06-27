@@ -6,7 +6,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import com.yujin.record.app.RecordApplication
-import com.yujin.record.feature.calendar.CalendarScreen
+import com.yujin.record.feature.calendar.CalendarRoute
 import com.yujin.record.feature.review.detail.ReviewDetailRoute
 import com.yujin.record.feature.review.edit.ReviewEditRoute
 
@@ -22,11 +22,16 @@ fun RecordNavGraph(
             navController.navigate(route = RecordRoute.ReviewDetail(id))
         }
 
+        val reviewRepository =
+            (navController.context.applicationContext as RecordApplication).reviewRepository
+
         composable<RecordRoute.Calendar> {
-            CalendarScreen(
-                onCreateReviewClick = {
+            CalendarRoute(
+                onNavigateToCreate = {
                     navController.navigate(route = RecordRoute.ReviewCreate)
-                }
+                },
+                onNavigateToDetail = onNavigateToDetail,
+                reviewRepository = reviewRepository,
             )
         }
 
@@ -34,7 +39,7 @@ fun RecordNavGraph(
             ReviewEditRoute(
                 onBackClick = navController::popBackStack,
                 onNavigateToDetail = onNavigateToDetail,
-                reviewRepository = (navController.context.applicationContext as RecordApplication).reviewRepository,
+                reviewRepository = reviewRepository,
             )
         }
 
@@ -44,7 +49,7 @@ fun RecordNavGraph(
                 reviewId = review.reviewId,
                 onBackClick = navController::popBackStack,
                 onNavigateToDetail = onNavigateToDetail,
-                reviewRepository = (navController.context.applicationContext as RecordApplication).reviewRepository,
+                reviewRepository = reviewRepository,
             )
         }
 
@@ -53,7 +58,7 @@ fun RecordNavGraph(
             ReviewDetailRoute(
                 reviewId = review.reviewId,
                 onBackClick = navController::popBackStack,
-                reviewRepository = (navController.context.applicationContext as RecordApplication).reviewRepository,
+                reviewRepository = reviewRepository,
             )
         }
     }

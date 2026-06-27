@@ -8,7 +8,7 @@ import androidx.room.Transaction
 import androidx.room.Update
 import com.yujin.record.core.database.model.ReviewEntity
 import com.yujin.record.core.database.model.ReviewWithImages
-import kotlinx.coroutines.flow.Flow
+import kotlin.time.Instant
 
 @Dao
 interface ReviewDao {
@@ -30,6 +30,6 @@ interface ReviewDao {
     suspend fun getById(reviewId: Long): ReviewWithImages?
 
     @Transaction
-    @Query("SELECT * FROM reviews WHERE created_at BETWEEN :startDate AND :endDate")
-    fun getByDateRange(startDate: Long, endDate: Long): Flow<List<ReviewWithImages>>
+    @Query("SELECT * FROM reviews WHERE created_at BETWEEN :start AND :end")
+    suspend fun getByDateRange(start: Instant, end: Instant): List<ReviewWithImages>
 }
