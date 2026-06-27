@@ -18,6 +18,10 @@ fun RecordNavGraph(
         navController = navController,
         startDestination = RecordRoute.Calendar,
     ) {
+        val onNavigateToDetail: (Long) -> Unit = { id ->
+            navController.navigate(route = RecordRoute.ReviewDetail(id))
+        }
+
         composable<RecordRoute.Calendar> {
             CalendarScreen(
                 onCreateReviewClick = {
@@ -29,9 +33,7 @@ fun RecordNavGraph(
         composable<RecordRoute.ReviewCreate> {
             ReviewEditRoute(
                 onBackClick = navController::popBackStack,
-                onNavigateToDetail = { id ->
-                    navController.navigate(route = RecordRoute.ReviewDetail(id))
-                },
+                onNavigateToDetail = onNavigateToDetail,
                 reviewRepository = (navController.context.applicationContext as RecordApplication).reviewRepository,
             )
         }
@@ -41,9 +43,7 @@ fun RecordNavGraph(
             ReviewEditRoute(
                 reviewId = review.reviewId,
                 onBackClick = navController::popBackStack,
-                onNavigateToDetail = { id ->
-                    navController.navigate(route = RecordRoute.ReviewDetail(id))
-                },
+                onNavigateToDetail = onNavigateToDetail,
                 reviewRepository = (navController.context.applicationContext as RecordApplication).reviewRepository,
             )
         }

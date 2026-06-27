@@ -2,10 +2,12 @@ package com.yujin.record.core.data.repository
 
 import androidx.room.Transaction
 import com.yujin.record.core.data.mapper.toEntity
+import com.yujin.record.core.data.mapper.toReview
 import com.yujin.record.core.database.dao.ImageDao
 import com.yujin.record.core.database.dao.ReviewDao
 import com.yujin.record.core.model.Review
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 import kotlin.time.Clock
 
 class ReviewRepositoryImpl(
@@ -43,7 +45,7 @@ class ReviewRepositoryImpl(
             updatedCount
         }
 
-    override fun getReviewById(id: Long): Flow<Review?> {
-        TODO("Not yet implemented")
+    override suspend fun getReviewById(id: Long): Review? {
+        return reviewDao.getById(id)?.toReview()
     }
 }
