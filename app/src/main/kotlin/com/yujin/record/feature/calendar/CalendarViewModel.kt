@@ -18,16 +18,13 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.YearMonth
 import kotlinx.datetime.minus
-import kotlinx.datetime.minusMonth
 import kotlinx.datetime.plus
-import kotlinx.datetime.plusMonth
 import kotlinx.datetime.toJavaDayOfWeek
 import kotlinx.datetime.toLocalDateTime
 import kotlin.math.ceil
@@ -42,44 +39,41 @@ class CalendarViewModel(
             .date
     )
 
-    private val selectedMonth = MutableStateFlow(selectedDate.value.toYearMonth())
+    private val currentMonth = MutableStateFlow(selectedDate.value.toYearMonth())
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    private val monthlyReviews =
-        selectedMonth
+    private val reviewsForMonth =
+        currentMonth
             .flatMapLatest { month ->
                 reviewRepository.observeReviewsByMonth(month)
             }.map { list ->
                 list.map { it.toReview() }
             }
 
-    private val calendarDays =
-        combine(
-            selectedMonth,
-            monthlyReviews,
-        ) { month, reviews ->
-            buildCalendar(month, reviews)
-        }
-
     val uiState: StateFlow<CalendarUiState> =
         combine(
-            selectedMonth,
+            currentMonth,
             selectedDate,
-            monthlyReviews,
-            calendarDays,
-        ) { month, date, reviews, calendarDays ->
+            reviewsForMonth,
+        ) { month, date, reviews ->
             CalendarUiState(
-                month = month,
-                selectedDate = date,
-                calendarDays = calendarDays,
+                calendarState = CalendarState(
+                    displayedYearMonth = month,
+                    selectedDate = date,
+                    calendarDays = buildCalendar(month, reviews),
+                ),
                 reviews = reviews,
             )
         }.stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),
             initialValue = CalendarUiState(
-                month = selectedMonth.value,
-                selectedDate = selectedDate.value,
+                calendarState = CalendarState(
+                    displayedYearMonth = currentMonth.value,
+                    selectedDate = selectedDate.value,
+                    calendarDays = buildCalendar(currentMonth.value, emptyList()),
+                ),
+                reviews = emptyList()
             )
         )
 
@@ -95,20 +89,15 @@ class CalendarViewModel(
 
     fun onAction(action: CalendarUiAction) {
         when (action) {
-            is CalendarUiAction.PreviousMonthClicked -> onPreviousMonthClick()
-            is CalendarUiAction.NextMonthClicked -> onNextMonthClick()
+            is CalendarUiAction.MonthChanged -> onMonthChange(action.month)
             is CalendarUiAction.DateClicked -> onDateClick(action.date)
             is CalendarUiAction.CreateReviewClicked -> onCreateReviewClick()
             is CalendarUiAction.ReviewClicked -> onReviewClick(action.reviewId)
         }
     }
 
-    fun onPreviousMonthClick() {
-        selectedMonth.update { it.minusMonth() }
-    }
-
-    fun onNextMonthClick() {
-        selectedMonth.update { it.plusMonth() }
+    fun onMonthChange(month: YearMonth) {
+        currentMonth.value = month
     }
 
     fun onDateClick(date: LocalDate) {

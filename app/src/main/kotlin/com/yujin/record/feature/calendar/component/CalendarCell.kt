@@ -15,13 +15,10 @@ fun CalendarCell(
     modifier: Modifier = Modifier,
     state: CalendarCellUiState.Active,
     selected: Boolean = false,
-    imageResId: Int? = null,
     onClick: () -> Unit = {}
 ) {
     Box(modifier = modifier.clickable(onClick = onClick)) {
-        imageResId?.let {
-            ReviewThumbnail(resId = imageResId)
-        }
+        // todo state.thumbnailUrl
 
         Text(
             text = state.date.day.toString(),

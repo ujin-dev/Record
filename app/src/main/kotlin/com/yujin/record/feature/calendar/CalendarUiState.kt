@@ -5,10 +5,14 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.YearMonth
 
 data class CalendarUiState(
-    val month: YearMonth,
+    val calendarState : CalendarState,
+    val reviews: List<Review> = emptyList(),
+)
+
+data class CalendarState(
+    val displayedYearMonth: YearMonth,
     val selectedDate: LocalDate,
     val calendarDays: List<CalendarCellUiState> = emptyList(),
-    val reviews: List<Review> = emptyList()
 )
 
 sealed interface CalendarCellUiState {

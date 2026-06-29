@@ -24,7 +24,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.yujin.record.feature.calendar.component.CalendarGrid
+import com.yujin.record.feature.calendar.component.CalendarPager
 import com.yujin.record.feature.calendar.component.WeekDayRow
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -37,7 +37,7 @@ fun CalendarScreen(
         modifier = Modifier.fillMaxSize(),
         topBar = {
             TopAppBar(title = {
-                Text(text = uiState.month.toDisplayString())
+                Text(text = uiState.calendarState.displayedYearMonth.toDisplayString())
             })
         },
         floatingActionButton = {
@@ -55,10 +55,9 @@ fun CalendarScreen(
         ) {
             WeekDayRow()
 
-            CalendarGrid(
-                days = uiState.calendarDays,
-                selectedDate = uiState.selectedDate,
-                onDateClick = { date -> onAction(CalendarUiAction.DateClicked(date)) }
+            CalendarPager(
+                state = uiState.calendarState,
+                onAction = onAction,
             )
 
             HorizontalDivider()
