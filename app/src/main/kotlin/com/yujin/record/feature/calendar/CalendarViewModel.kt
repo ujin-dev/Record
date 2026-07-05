@@ -8,6 +8,7 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.yujin.record.core.data.mapper.toReview
 import com.yujin.record.core.data.repository.ReviewRepository
 import com.yujin.record.core.model.Review
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,10 +28,12 @@ import kotlinx.datetime.minus
 import kotlinx.datetime.plus
 import kotlinx.datetime.toJavaDayOfWeek
 import kotlinx.datetime.toLocalDateTime
+import javax.inject.Inject
 import kotlin.math.ceil
 import kotlin.time.Clock
 
-class CalendarViewModel(
+@HiltViewModel
+class CalendarViewModel @Inject constructor(
     private val reviewRepository: ReviewRepository
 ) : ViewModel() {
     private val selectedDate = MutableStateFlow(
@@ -79,13 +82,6 @@ class CalendarViewModel(
 
     private val _uiEvent = MutableSharedFlow<CalendarUiEvent>()
     val uiEvent = _uiEvent.asSharedFlow()
-
-    companion object {
-        fun factory(reviewRepository: ReviewRepository): ViewModelProvider.Factory =
-            viewModelFactory {
-                initializer { CalendarViewModel(reviewRepository) }
-            }
-    }
 
     fun onAction(action: CalendarUiAction) {
         when (action) {

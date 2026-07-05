@@ -3,24 +3,15 @@ package com.yujin.record.feature.review.edit
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.yujin.record.core.data.repository.ReviewRepository
 
 @Composable
 fun ReviewEditRoute(
-    reviewId: Long? = null,
     onBackClick: () -> Unit,
     onNavigateToDetail: (Long) -> Unit,
-    reviewRepository: ReviewRepository,
-    viewModel: ReviewEditViewModel = viewModel(
-        factory = ReviewEditViewModel.factory(reviewRepository)
-    )
+    viewModel: ReviewEditViewModel = hiltViewModel()
 ) {
-    LaunchedEffect(reviewId) {
-        viewModel.initialize(reviewId)
-    }
-
     LaunchedEffect(Unit) {
         viewModel.uiEvent.collect { event ->
             when (event) {

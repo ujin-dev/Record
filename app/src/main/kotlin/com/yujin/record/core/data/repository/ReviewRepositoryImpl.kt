@@ -15,9 +15,10 @@ import kotlinx.datetime.atStartOfDayIn
 import kotlinx.datetime.plus
 import kotlinx.datetime.toKotlinTimeZone
 import java.time.ZoneId
+import javax.inject.Inject
 import kotlin.time.Clock
 
-class ReviewRepositoryImpl(
+class ReviewRepositoryImpl @Inject constructor(
     private val reviewDao: ReviewDao,
     private val imageDao: ImageDao,
 ) : ReviewRepository {

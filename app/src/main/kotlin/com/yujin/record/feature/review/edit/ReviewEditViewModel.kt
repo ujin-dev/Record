@@ -1,14 +1,15 @@
 package com.yujin.record.feature.review.edit
 
 import android.net.Uri
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
+import androidx.navigation.toRoute
+import com.yujin.record.app.navigation.RecordRoute
 import com.yujin.record.core.data.repository.ReviewRepository
 import com.yujin.record.core.model.ImageItem
 import com.yujin.record.core.model.ReviewType
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -16,8 +17,11 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class ReviewEditViewModel(
+@HiltViewModel
+class ReviewEditViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
     private val reviewRepository: ReviewRepository,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(ReviewEditUiState())
@@ -26,23 +30,17 @@ class ReviewEditViewModel(
     private val _uiEvent = MutableSharedFlow<ReviewEditUiEvent>()
     val uiEvent = _uiEvent.asSharedFlow()
 
-    private var currentReviewId: Long? = null
+    private var currentReviewId: Long? = runCatching {
+        savedStateHandle.toRoute<RecordRoute.ReviewEdit>().reviewId
+    }.getOrNull()
 
-    companion object {
-        fun factory(reviewRepository: ReviewRepository): ViewModelProvider.Factory =
-            viewModelFactory {
-                initializer { ReviewEditViewModel(reviewRepository) }
-            }
+    init {
+        currentReviewId?.let(::loadReview)
     }
 
-    fun initialize(reviewId: Long?) {
-        if (reviewId != currentReviewId) {
-            currentReviewId = reviewId
-            reviewId?.let { loadReview(reviewId) }
-        }
+    private fun loadReview(reviewId: Long) {
+        // todo
     }
-
-    private fun loadReview(reviewId: Long) {}
 
     fun onAction(action: ReviewEditUiAction) {
         when (action) {
