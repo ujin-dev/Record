@@ -23,7 +23,7 @@ fun RecordNavGraph(
         composable<RecordRoute.Calendar> {
             CalendarRoute(
                 onNavigateToCreate = {
-                    navController.navigate(route = RecordRoute.ReviewForm)
+                    navController.navigate(route = RecordRoute.ReviewForm())
                 },
                 onNavigateToDetail = onNavigateToDetail,
             )

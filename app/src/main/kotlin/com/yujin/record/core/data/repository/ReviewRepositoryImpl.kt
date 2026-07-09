@@ -53,8 +53,8 @@ class ReviewRepositoryImpl @Inject constructor(
             updatedCount
         }
 
-    override suspend fun getReviewById(id: Long): Review? {
-        return reviewDao.getById(id)?.toReview()
+    override suspend fun getReviewById(id: Long): Result<Review> = runCatching {
+        reviewDao.getById(id)?.toReview() ?: throw NoSuchElementException()
     }
 
     override fun observeReviewsByDate(date: LocalDate): Flow<List<ReviewWithImages>> {

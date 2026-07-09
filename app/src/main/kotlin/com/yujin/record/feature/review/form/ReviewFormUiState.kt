@@ -36,3 +36,18 @@ fun ReviewFormUiState.toReview() = Review(
     createdAt = createdAt,
     updatedAt = updatedAt,
 )
+
+fun Review.toUiState() = ReviewFormUiState(
+    id = id,
+    title = title,
+    content = content,
+    shortReview = shortReview,
+    type = reviewType,
+    creatorName = creatorName,
+    rating = rating,
+    images = images,
+    tags = tags,
+    selectedBookmarkId = bookmarkId,
+    createdAt = createdAt,
+    updatedAt = updatedAt,
+)

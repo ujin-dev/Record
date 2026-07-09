@@ -37,8 +37,13 @@ class ReviewFormViewModel @Inject constructor(
         currentReviewId?.let(::loadReview)
     }
 
-    private fun loadReview(reviewId: Long) {
-        // todo
+    private fun loadReview(reviewId: Long) = viewModelScope.launch {
+        reviewRepository.getReviewById(reviewId)
+            .onSuccess { review ->
+                _uiState.update { review.toUiState() }
+            }.onFailure {
+                _uiEvent.emit(ReviewFormUiEvent.ShowToast("리뷰를 불러오는데 실패했습니다."))
+            }
     }
 
     fun onAction(action: ReviewFormUiAction) {

@@ -31,10 +31,9 @@ class ReviewDetailViewModel @Inject constructor(
         _uiState.value = ReviewDetailScreenState.Loading
 
         val result = reviewRepository.getReviewById(reviewId)
-        _uiState.value = if (result != null) {
-            ReviewDetailScreenState.Success(result.toUiState())
-        } else {
-            ReviewDetailScreenState.NotFound
-        }
+        _uiState.value = result.fold(
+            onSuccess = { review -> ReviewDetailScreenState.Success(review.toUiState()) },
+            onFailure = { ReviewDetailScreenState.NotFound }
+        )
     }
 }
