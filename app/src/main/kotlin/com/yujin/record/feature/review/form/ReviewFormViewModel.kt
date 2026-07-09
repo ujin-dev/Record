@@ -63,6 +63,7 @@ class ReviewFormViewModel @Inject constructor(
             ReviewFormUiAction.SaveClicked -> saveReview()
             ReviewFormUiAction.ImagePickerClicked -> openImagePicker()
             ReviewFormUiAction.BookmarkSelectorClicked -> openBookmarkSelector()
+            ReviewFormUiAction.BackClicked -> backStack()
         }
     }
 
@@ -83,6 +84,10 @@ class ReviewFormViewModel @Inject constructor(
     private fun openImagePicker() {}
 
     private fun openBookmarkSelector() {}
+
+    private fun backStack() = viewModelScope.launch {
+        _uiEvent.emit(ReviewFormUiEvent.NavigateToBack)
+    }
 
     private fun onReviewTypeChanged(type: ReviewType) {
         _uiState.update { state ->

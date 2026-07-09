@@ -37,9 +37,9 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.yujin.record.core.model.ReviewType
 import com.yujin.record.core.ui.preview.DefaultScreenPreviews
 import com.yujin.record.core.ui.theme.RecordTheme
-import com.yujin.record.core.model.ReviewType
 
 private val reviewTypeOptions = listOf(ReviewType.MOVIE, ReviewType.BOOK)
 
@@ -47,7 +47,6 @@ private val reviewTypeOptions = listOf(ReviewType.MOVIE, ReviewType.BOOK)
 @Composable
 fun ReviewFormScreen(
     uiState: ReviewFormUiState,
-    onBackClick: () -> Unit = {},
     onAction: (ReviewFormUiAction) -> Unit,
 ) {
     Scaffold(
@@ -56,7 +55,7 @@ fun ReviewFormScreen(
             TopAppBar(
                 title = { Text(text = "리뷰 작성") },
                 navigationIcon = {
-                    IconButton(onClick = onBackClick) {
+                    IconButton(onClick = { onAction(ReviewFormUiAction.BackClicked) }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
                             contentDescription = "뒤로가기"

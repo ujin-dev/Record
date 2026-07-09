@@ -30,7 +30,7 @@ import com.yujin.record.core.ui.toDisplayString
 @Composable
 fun ReviewDetailScreen(
     uiState: ReviewDetailScreenState,
-    onBackClick: () -> Unit,
+    onAction: (ReviewDetailUiAction) -> Unit,
 ) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -38,7 +38,7 @@ fun ReviewDetailScreen(
             TopAppBar(
                 title = { Text(text = "리뷰 상세") },
                 navigationIcon = {
-                    IconButton(onClick = onBackClick) {
+                    IconButton(onClick = { onAction(ReviewDetailUiAction.BackClicked) }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
                             contentDescription = "뒤로가기"
@@ -49,7 +49,7 @@ fun ReviewDetailScreen(
                     if (uiState is ReviewDetailScreenState.Success) {
                         IconButton(
                             onClick = {
-                                // todo
+                                onAction(ReviewDetailUiAction.EditClicked)
                             },
                         ) {
                             Icon(
@@ -59,7 +59,7 @@ fun ReviewDetailScreen(
                         }
                         IconButton(
                             onClick = {
-                                // todo
+                                onAction(ReviewDetailUiAction.DeleteClicked)
                             },
                         ) {
                             Icon(

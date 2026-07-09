@@ -17,6 +17,7 @@ fun ReviewFormRoute(
             when (event) {
                 is ReviewFormUiEvent.NavigateToDetail -> onNavigateToDetail(event.id)
                 is ReviewFormUiEvent.ShowToast -> {} // TODO: Show toast
+                ReviewFormUiEvent.NavigateToBack -> onBackClick()
             }
         }
     }
@@ -25,7 +26,6 @@ fun ReviewFormRoute(
 
     ReviewFormScreen(
         uiState = uiState,
-        onBackClick = onBackClick,
         onAction = viewModel::onAction,
     )
 }

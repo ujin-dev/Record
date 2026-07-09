@@ -32,8 +32,8 @@ fun RecordNavGraph(
                 onBackClick = navController::popBackStack,
                 onNavigateToDetail = { id ->
                     navController.navigate(RecordRoute.ReviewDetail(id)) {
-                        popUpTo(RecordRoute.ReviewForm()) {
-                            inclusive = true
+                        popUpTo(RecordRoute.Calendar) {
+                            inclusive = false
                         }
                     }
                 },
@@ -42,6 +42,9 @@ fun RecordNavGraph(
 
         composable<RecordRoute.ReviewDetail> {
             ReviewDetailRoute(
+                onEditClick = { id ->
+                    navController.navigate(RecordRoute.ReviewForm(id))
+                },
                 onBackClick = navController::popBackStack,
             )
         }

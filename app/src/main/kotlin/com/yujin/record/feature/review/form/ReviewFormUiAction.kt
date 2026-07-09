@@ -3,6 +3,7 @@ package com.yujin.record.feature.review.form
 import com.yujin.record.core.model.ReviewType
 
 sealed interface ReviewFormUiAction {
+    object BackClicked : ReviewFormUiAction
     data object SaveClicked : ReviewFormUiAction
     data object ImagePickerClicked : ReviewFormUiAction
     data object BookmarkSelectorClicked : ReviewFormUiAction

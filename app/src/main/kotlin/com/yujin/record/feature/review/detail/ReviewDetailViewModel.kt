@@ -7,8 +7,10 @@ import androidx.navigation.toRoute
 import com.yujin.record.app.navigation.RecordRoute
 import com.yujin.record.core.data.repository.ReviewRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -23,6 +25,9 @@ class ReviewDetailViewModel @Inject constructor(
         MutableStateFlow<ReviewDetailScreenState>(ReviewDetailScreenState.Loading)
     val uiState: StateFlow<ReviewDetailScreenState> = _uiState
 
+    private val _uiEvent = MutableSharedFlow<ReviewDetailUiEvent>()
+    val uiEvent = _uiEvent.asSharedFlow()
+
     init {
         loadReview()
     }
@@ -35,5 +40,25 @@ class ReviewDetailViewModel @Inject constructor(
             onSuccess = { review -> ReviewDetailScreenState.Success(review.toUiState()) },
             onFailure = { ReviewDetailScreenState.NotFound }
         )
+    }
+
+    fun onAction(action: ReviewDetailUiAction) {
+        when (action) {
+            ReviewDetailUiAction.BackClicked -> backStack()
+            ReviewDetailUiAction.EditClicked -> editReview()
+            ReviewDetailUiAction.DeleteClicked -> deleteReview()
+        }
+    }
+
+    private fun backStack() = viewModelScope.launch {
+        _uiEvent.emit(ReviewDetailUiEvent.NavigateToBack)
+    }
+
+    private fun editReview() = viewModelScope.launch {
+        _uiEvent.emit(ReviewDetailUiEvent.NavigateToForm(reviewId))
+    }
+
+    private fun deleteReview() {
+        // todo
     }
 }
