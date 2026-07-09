@@ -1,5 +1,8 @@
 package com.yujin.record.feature.review.form
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -40,8 +43,10 @@ import androidx.compose.ui.unit.dp
 import com.yujin.record.core.model.ReviewType
 import com.yujin.record.core.ui.preview.DefaultScreenPreviews
 import com.yujin.record.core.ui.theme.RecordTheme
+import com.yujin.record.feature.review.component.ImageList
 
-private val reviewTypeOptions = listOf(ReviewType.MOVIE, ReviewType.BOOK)
+private val REVIEW_TYPE_OPTIONS = ReviewType.entries
+private const val MAX_IMAGE_COUNT = 3
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -49,6 +54,28 @@ fun ReviewFormScreen(
     uiState: ReviewFormUiState,
     onAction: (ReviewFormUiAction) -> Unit,
 ) {
+    val remainImageSize = MAX_IMAGE_COUNT - uiState.images.size
+
+    val launcher = if (remainImageSize > 1) {
+        rememberLauncherForActivityResult(
+            ActivityResultContracts.PickMultipleVisualMedia(
+                maxItems = remainImageSize
+            )
+        ) { uris ->
+            if (uris.isNotEmpty()) {
+                onAction(ReviewFormUiAction.ImageAdded(uris))
+            }
+        }
+    } else {
+        rememberLauncherForActivityResult(
+            ActivityResultContracts.PickVisualMedia()
+        ) { uri ->
+            uri?.let {
+                onAction(ReviewFormUiAction.ImageAdded(listOf(it)))
+            }
+        }
+    }
+
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
@@ -64,8 +91,14 @@ fun ReviewFormScreen(
                 },
                 actions = {
                     IconButton(
-                        onClick = { onAction(ReviewFormUiAction.ImagePickerClicked) },
-                        enabled = true,
+                        onClick = {
+                            launcher.launch(
+                                PickVisualMediaRequest(
+                                    ActivityResultContracts.PickVisualMedia.ImageOnly
+                                )
+                            )
+                        },
+                        enabled = remainImageSize > 0,
                     ) {
                         Icon(
                             imageVector = Icons.Default.AddPhotoAlternate,
@@ -102,14 +135,19 @@ fun ReviewFormScreen(
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 16.dp, vertical = 16.dp) // content padding
         ) {
+            ImageList(
+                images = uiState.images.map { it.uri },
+                onRemoveClick = { index -> onAction(ReviewFormUiAction.ImageRemoved(index)) },
+            )
+
             SingleChoiceSegmentedButtonRow(
                 modifier = Modifier.fillMaxWidth()
             ) {
-                reviewTypeOptions.forEachIndexed { index, reviewType ->
+                REVIEW_TYPE_OPTIONS.forEachIndexed { index, reviewType ->
                     SegmentedButton(
                         shape = SegmentedButtonDefaults.itemShape(
                             index = index,
-                            count = reviewTypeOptions.size
+                            count = REVIEW_TYPE_OPTIONS.size
                         ),
                         onClick = { onAction(ReviewFormUiAction.TypeChanged(reviewType)) },
                         selected = reviewType == uiState.type,
@@ -218,16 +256,5 @@ fun ReviewFormScreen(
                 )
             }
         }
-    }
-}
-
-@Composable
-@DefaultScreenPreviews
-fun ReviewFormScreenPreview() {
-    RecordTheme {
-        ReviewFormScreen(
-            uiState = ReviewFormUiState(),
-            onAction = {}
-        )
     }
 }

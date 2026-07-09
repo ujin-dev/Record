@@ -53,15 +53,14 @@ class ReviewFormViewModel @Inject constructor(
             is ReviewFormUiAction.CreatorNameChanged -> onCreatorNameChanged(action.creatorName)
             is ReviewFormUiAction.ContentChanged -> onContentChanged(action.content)
             is ReviewFormUiAction.ShortReviewChanged -> onShortReviewChanged(action.shortReview)
-
             is ReviewFormUiAction.RatingChanged -> onRatingChanged(action.rating)
-
+            is ReviewFormUiAction.ImageAdded -> onImageAdded(action.images)
+            is ReviewFormUiAction.ImageRemoved -> onImageRemoved(action.index)
             is ReviewFormUiAction.TagChanged -> onTagChanged(action.tag)
             is ReviewFormUiAction.TagAdded -> onTagAdded(action.tag)
             is ReviewFormUiAction.TagRemoved -> onTagRemoved(action.tag)
 
             ReviewFormUiAction.SaveClicked -> saveReview()
-            ReviewFormUiAction.ImagePickerClicked -> openImagePicker()
             ReviewFormUiAction.BookmarkSelectorClicked -> openBookmarkSelector()
             ReviewFormUiAction.BackClicked -> backStack()
         }
@@ -81,7 +80,9 @@ class ReviewFormViewModel @Inject constructor(
 
     private fun deleteReview() {}
 
-    private fun openImagePicker() {}
+    private fun openImagePicker() {
+
+    }
 
     private fun openBookmarkSelector() {}
 
@@ -150,7 +151,19 @@ class ReviewFormViewModel @Inject constructor(
 
     private fun validateInput() {}
 
-    fun onImageAdded(images: List<Uri>) {}
+    fun onImageAdded(images: List<Uri>) {
+        _uiState.update { state ->
+            state.copy(images = state.images + images.map { ImageItem(uri = it) })
+        }
+    }
+
+    fun onImageRemoved(index: Int) {
+        _uiState.update { state ->
+            state.copy(images = state.images.toMutableList().apply {
+                removeAt(index)
+            })
+        }
+    }
 
     fun onImageRemoved(imageItem: ImageItem) {}
 

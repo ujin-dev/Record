@@ -1,11 +1,11 @@
 package com.yujin.record.feature.review.form
 
+import android.net.Uri
 import com.yujin.record.core.model.ReviewType
 
 sealed interface ReviewFormUiAction {
     object BackClicked : ReviewFormUiAction
     data object SaveClicked : ReviewFormUiAction
-    data object ImagePickerClicked : ReviewFormUiAction
     data object BookmarkSelectorClicked : ReviewFormUiAction
 
     data class TitleChanged(val title: String) : ReviewFormUiAction
@@ -17,4 +17,6 @@ sealed interface ReviewFormUiAction {
     data class TagChanged(val tag: String) : ReviewFormUiAction
     data class TagAdded(val tag: String) : ReviewFormUiAction
     data class TagRemoved(val tag: String) : ReviewFormUiAction
+    data class ImageAdded(val images: List<Uri>) : ReviewFormUiAction
+    data class ImageRemoved(val index: Int) : ReviewFormUiAction
 }
