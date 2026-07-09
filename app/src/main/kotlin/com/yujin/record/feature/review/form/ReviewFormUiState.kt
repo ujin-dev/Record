@@ -1,4 +1,4 @@
-package com.yujin.record.feature.review.edit
+package com.yujin.record.feature.review.form
 
 import com.yujin.record.core.model.ImageItem
 import com.yujin.record.core.model.Review
@@ -6,7 +6,7 @@ import com.yujin.record.core.model.ReviewType
 import kotlin.time.Clock
 import kotlin.time.Instant
 
-data class ReviewEditUiState(
+data class ReviewFormUiState(
     val id: Long = 0,
     val title: String = "",
     val content: String = "",
@@ -22,7 +22,7 @@ data class ReviewEditUiState(
     val updatedAt: Instant = Clock.System.now(),
 )
 
-fun ReviewEditUiState.toReview() = Review(
+fun ReviewFormUiState.toReview() = Review(
     id = id,
     title = title.trim(),
     content = content.trim(),

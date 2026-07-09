@@ -8,11 +8,8 @@ sealed interface RecordRoute {
     data object Calendar : RecordRoute
 
     @Serializable
-    data object ReviewCreate : RecordRoute
-
-    @Serializable
-    data class ReviewEdit(
-        val reviewId: Long
+    data class ReviewForm(
+        val reviewId: Long? = null
     ) : RecordRoute
 
     @Serializable

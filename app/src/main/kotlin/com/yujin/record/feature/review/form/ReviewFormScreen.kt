@@ -1,4 +1,4 @@
-package com.yujin.record.feature.review.edit
+package com.yujin.record.feature.review.form
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -45,10 +45,10 @@ private val reviewTypeOptions = listOf(ReviewType.MOVIE, ReviewType.BOOK)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ReviewEditScreen(
-    uiState: ReviewEditUiState,
+fun ReviewFormScreen(
+    uiState: ReviewFormUiState,
     onBackClick: () -> Unit = {},
-    onAction: (ReviewEditUiAction) -> Unit,
+    onAction: (ReviewFormUiAction) -> Unit,
 ) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -65,7 +65,7 @@ fun ReviewEditScreen(
                 },
                 actions = {
                     IconButton(
-                        onClick = { onAction(ReviewEditUiAction.ImagePickerClicked) },
+                        onClick = { onAction(ReviewFormUiAction.ImagePickerClicked) },
                         enabled = true,
                     ) {
                         Icon(
@@ -75,7 +75,7 @@ fun ReviewEditScreen(
                     }
 
                     IconButton(
-                        onClick = { onAction(ReviewEditUiAction.BookmarkSelectorClicked) },
+                        onClick = { onAction(ReviewFormUiAction.BookmarkSelectorClicked) },
                         enabled = true,
                     ) {
                         Icon(
@@ -85,7 +85,7 @@ fun ReviewEditScreen(
                     }
 
                     IconButton(
-                        onClick = { onAction(ReviewEditUiAction.SaveClicked) },
+                        onClick = { onAction(ReviewFormUiAction.SaveClicked) },
                         enabled = true,
                     ) {
                         Icon(
@@ -112,7 +112,7 @@ fun ReviewEditScreen(
                             index = index,
                             count = reviewTypeOptions.size
                         ),
-                        onClick = { onAction(ReviewEditUiAction.TypeChanged(reviewType)) },
+                        onClick = { onAction(ReviewFormUiAction.TypeChanged(reviewType)) },
                         selected = reviewType == uiState.type,
                         label = { Text(text = reviewType.displayName) }
                     )
@@ -122,7 +122,7 @@ fun ReviewEditScreen(
             // title
             OutlinedTextField(
                 value = uiState.title,
-                onValueChange = { onAction(ReviewEditUiAction.TitleChanged(it)) },
+                onValueChange = { onAction(ReviewFormUiAction.TitleChanged(it)) },
                 modifier = Modifier.fillMaxWidth(),
                 label = { Text(text = "제목") },
                 singleLine = true,
@@ -131,7 +131,7 @@ fun ReviewEditScreen(
             // creator
             OutlinedTextField(
                 value = uiState.creatorName,
-                onValueChange = { onAction(ReviewEditUiAction.CreatorNameChanged(it)) },
+                onValueChange = { onAction(ReviewFormUiAction.CreatorNameChanged(it)) },
                 modifier = Modifier.fillMaxWidth(),
                 label = {
                     Text(if (uiState.type == ReviewType.MOVIE) "감독" else "저자")
@@ -142,7 +142,7 @@ fun ReviewEditScreen(
             // content
             OutlinedTextField(
                 value = uiState.content,
-                onValueChange = { onAction(ReviewEditUiAction.ContentChanged(it)) },
+                onValueChange = { onAction(ReviewFormUiAction.ContentChanged(it)) },
                 label = { Text("상세 리뷰") },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -152,7 +152,7 @@ fun ReviewEditScreen(
             // short review
             OutlinedTextField(
                 value = uiState.shortReview,
-                onValueChange = { onAction(ReviewEditUiAction.ShortReviewChanged(it)) },
+                onValueChange = { onAction(ReviewFormUiAction.ShortReviewChanged(it)) },
                 modifier = Modifier.fillMaxWidth(),
                 label = {
                     Text("한줄평")
@@ -164,7 +164,7 @@ fun ReviewEditScreen(
             // improvement : https://developer.android.com/develop/ui/compose/touch-input/scroll/scroll-modifiers#scrollable-modifier
             Row {
                 repeat(5) { index ->
-                    IconButton(onClick = { onAction(ReviewEditUiAction.RatingChanged((index + 1).toFloat())) }) {
+                    IconButton(onClick = { onAction(ReviewFormUiAction.RatingChanged((index + 1).toFloat())) }) {
                         Icon(
                             imageVector = if (index < uiState.rating) Icons.Default.Star else Icons.Default.StarBorder,
                             tint = MaterialTheme.colorScheme.primary,
@@ -191,7 +191,7 @@ fun ReviewEditScreen(
                                 modifier = Modifier
                                     .size(InputChipDefaults.IconSize)
                                     .clickable {
-                                        onAction(ReviewEditUiAction.TagRemoved(tag))
+                                        onAction(ReviewFormUiAction.TagRemoved(tag))
                                     }
                             )
                         },
@@ -202,12 +202,12 @@ fun ReviewEditScreen(
 
                 OutlinedTextField(
                     value = uiState.tagInput,
-                    onValueChange = { onAction(ReviewEditUiAction.TagChanged(it)) },
+                    onValueChange = { onAction(ReviewFormUiAction.TagChanged(it)) },
                     placeholder = { Text("태그 입력") },
                     singleLine = true,
                     trailingIcon = {
                         IconButton(onClick = {
-                            onAction(ReviewEditUiAction.TagAdded(uiState.tagInput))
+                            onAction(ReviewFormUiAction.TagAdded(uiState.tagInput))
                         }) {
                             Icon(
                                 imageVector = Icons.Default.AddCircleOutline,
@@ -224,10 +224,10 @@ fun ReviewEditScreen(
 
 @Composable
 @DefaultScreenPreviews
-fun ReviewEditScreenPreview() {
+fun ReviewFormScreenPreview() {
     RecordTheme {
-        ReviewEditScreen(
-            uiState = ReviewEditUiState(),
+        ReviewFormScreen(
+            uiState = ReviewFormUiState(),
             onAction = {}
         )
     }

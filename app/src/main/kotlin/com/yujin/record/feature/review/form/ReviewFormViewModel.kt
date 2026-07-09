@@ -1,4 +1,4 @@
-package com.yujin.record.feature.review.edit
+package com.yujin.record.feature.review.form
 
 import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
@@ -20,19 +20,18 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class ReviewEditViewModel @Inject constructor(
+class ReviewFormViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val reviewRepository: ReviewRepository,
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow(ReviewEditUiState())
-    val uiState: StateFlow<ReviewEditUiState> = _uiState.asStateFlow()
+    private val _uiState = MutableStateFlow(ReviewFormUiState())
+    val uiState: StateFlow<ReviewFormUiState> = _uiState.asStateFlow()
 
-    private val _uiEvent = MutableSharedFlow<ReviewEditUiEvent>()
+    private val _uiEvent = MutableSharedFlow<ReviewFormUiEvent>()
     val uiEvent = _uiEvent.asSharedFlow()
 
-    private var currentReviewId: Long? = runCatching {
-        savedStateHandle.toRoute<RecordRoute.ReviewEdit>().reviewId
-    }.getOrNull()
+    private var currentReviewId: Long? =
+        savedStateHandle.toRoute<RecordRoute.ReviewForm>().reviewId
 
     init {
         currentReviewId?.let(::loadReview)
@@ -42,23 +41,23 @@ class ReviewEditViewModel @Inject constructor(
         // todo
     }
 
-    fun onAction(action: ReviewEditUiAction) {
+    fun onAction(action: ReviewFormUiAction) {
         when (action) {
-            is ReviewEditUiAction.TitleChanged -> onTitleChanged(action.title)
-            is ReviewEditUiAction.TypeChanged -> onReviewTypeChanged(action.type)
-            is ReviewEditUiAction.CreatorNameChanged -> onCreatorNameChanged(action.creatorName)
-            is ReviewEditUiAction.ContentChanged -> onContentChanged(action.content)
-            is ReviewEditUiAction.ShortReviewChanged -> onShortReviewChanged(action.shortReview)
+            is ReviewFormUiAction.TitleChanged -> onTitleChanged(action.title)
+            is ReviewFormUiAction.TypeChanged -> onReviewTypeChanged(action.type)
+            is ReviewFormUiAction.CreatorNameChanged -> onCreatorNameChanged(action.creatorName)
+            is ReviewFormUiAction.ContentChanged -> onContentChanged(action.content)
+            is ReviewFormUiAction.ShortReviewChanged -> onShortReviewChanged(action.shortReview)
 
-            is ReviewEditUiAction.RatingChanged -> onRatingChanged(action.rating)
+            is ReviewFormUiAction.RatingChanged -> onRatingChanged(action.rating)
 
-            is ReviewEditUiAction.TagChanged -> onTagChanged(action.tag)
-            is ReviewEditUiAction.TagAdded -> onTagAdded(action.tag)
-            is ReviewEditUiAction.TagRemoved -> onTagRemoved(action.tag)
+            is ReviewFormUiAction.TagChanged -> onTagChanged(action.tag)
+            is ReviewFormUiAction.TagAdded -> onTagAdded(action.tag)
+            is ReviewFormUiAction.TagRemoved -> onTagRemoved(action.tag)
 
-            ReviewEditUiAction.SaveClicked -> saveReview()
-            ReviewEditUiAction.ImagePickerClicked -> openImagePicker()
-            ReviewEditUiAction.BookmarkSelectorClicked -> openBookmarkSelector()
+            ReviewFormUiAction.SaveClicked -> saveReview()
+            ReviewFormUiAction.ImagePickerClicked -> openImagePicker()
+            ReviewFormUiAction.BookmarkSelectorClicked -> openBookmarkSelector()
         }
     }
 
@@ -66,10 +65,10 @@ class ReviewEditViewModel @Inject constructor(
         viewModelScope.launch {
             reviewRepository.createReview(_uiState.value.toReview())
                 .onSuccess { id ->
-                    _uiEvent.emit(ReviewEditUiEvent.NavigateToDetail(id))
+                    _uiEvent.emit(ReviewFormUiEvent.NavigateToDetail(id))
                 }
                 .onFailure { e ->
-                    _uiEvent.emit(ReviewEditUiEvent.ShowToast("저장에 실패했습니다."))
+                    _uiEvent.emit(ReviewFormUiEvent.ShowToast("저장에 실패했습니다."))
                 }
         }
     }
