@@ -56,6 +56,8 @@ fun ReviewFormScreen(
 ) {
     val remainImageSize = MAX_IMAGE_COUNT - uiState.images.size
 
+    // PickMultipleVisualMedia requires maxItems >=2.
+    // otherwise, it throws on exception.
     val launcher = if (remainImageSize > 1) {
         rememberLauncherForActivityResult(
             ActivityResultContracts.PickMultipleVisualMedia(

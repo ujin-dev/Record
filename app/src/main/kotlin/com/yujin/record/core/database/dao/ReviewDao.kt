@@ -6,6 +6,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
+import androidx.room.Upsert
 import com.yujin.record.core.database.model.ReviewEntity
 import com.yujin.record.core.database.model.ReviewWithImages
 import kotlinx.coroutines.flow.Flow
@@ -13,11 +14,8 @@ import kotlin.time.Instant
 
 @Dao
 interface ReviewDao {
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(review: ReviewEntity): Long
-
-    @Update
-    suspend fun update(review: ReviewEntity): Int
+    @Upsert
+    suspend fun upsert(review: ReviewEntity): Long
 
     @Query("DELETE FROM reviews WHERE id = :reviewId")
     suspend fun deleteById(reviewId: Long): Int

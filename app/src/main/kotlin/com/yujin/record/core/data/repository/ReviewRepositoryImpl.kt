@@ -1,8 +1,13 @@
 package com.yujin.record.core.data.repository
 
-import androidx.room.Transaction
+import android.net.Uri
+import android.util.Log
+import androidx.core.net.toUri
+import androidx.room.withTransaction
+import com.yujin.record.core.data.ImageStorage
 import com.yujin.record.core.data.mapper.toEntity
 import com.yujin.record.core.data.mapper.toReview
+import com.yujin.record.core.database.AppDatabase
 import com.yujin.record.core.database.dao.ImageDao
 import com.yujin.record.core.database.dao.ReviewDao
 import com.yujin.record.core.database.model.ReviewWithImages
@@ -19,38 +24,76 @@ import javax.inject.Inject
 import kotlin.time.Clock
 
 class ReviewRepositoryImpl @Inject constructor(
+    private val database: AppDatabase,
     private val reviewDao: ReviewDao,
     private val imageDao: ImageDao,
+    private val imageStorage: ImageStorage,
 ) : ReviewRepository {
 
-    @Transaction
-    override suspend fun createReview(review: Review): Result<Long> =
+    override suspend fun upsertReview(review: Review): Result<Long> =
         runCatching {
-            val now = Clock.System.now()
-            val reviewId = reviewDao.insert(review.toEntity(createdAt = now, updatedAt = now))
+            val backupUris = mutableListOf<Uri>()
+            val isCreate = review.id == 0L
 
-            imageDao.insertAll(
-                review.images.mapIndexed { index, item ->
-                    item.toEntity(reviewId, index + 1)
+            try {
+                database.withTransaction {
+                    val now = Clock.System.now()
+
+                    val reviewId = reviewDao.upsert(
+                        review.toEntity(
+                            createdAt = if (isCreate) now else review.createdAt,
+                            updatedAt = now
+                        )
+                    ).takeIf { it != -1L } ?: review.id
+
+                    val oldImages =
+                        if (isCreate) listOf()
+                        else imageDao.getByReviewId(review.id)
+
+                    val deleteUris =
+                        if (oldImages.isNotEmpty()) {
+                            oldImages.map { it.uri.toUri() }.toSet() -
+                                    review.images.map { it.uri }.toSet()
+                        } else {
+                            emptySet()
+                        }
+
+                    val imageEntities = review.images.mapIndexed { index, item ->
+                        val backupUri =
+                            if (imageStorage.isBackupImage(item.uri)) {
+                                item.uri
+                            } else {
+                                imageStorage.backupImage(item.uri).also(backupUris::add)
+                            }
+
+                        item.copy(uri = backupUri).toEntity(reviewId, index + 1)
+                    }
+
+                    if (oldImages.isNotEmpty()) {
+                        imageDao.deleteAll(oldImages)
+                    }
+                    imageDao.insertAll(imageEntities)
+
+                    if (deleteUris.isNotEmpty()) {
+                        imageStorage.deleteImages(deleteUris.toList())
+                    }
+
+                    reviewId
                 }
-            )
-
-            reviewId
-        }
-
-    override suspend fun updateReview(review: Review): Result<Int> =
-        runCatching {
-            val now = Clock.System.now()
-            val updatedCount =
-                reviewDao.update(review.toEntity(createdAt = review.createdAt, updatedAt = now))
-
-            imageDao.updateAll(
-                review.images.mapIndexed { index, item ->
-                    item.toEntity(reviewId = review.id, order = index + 1)
+            } catch (e: Exception) {
+                runCatching {
+                    if (backupUris.isNotEmpty()) {
+                        imageStorage.deleteImages(backupUris)
+                    }
+                }.onFailure {
+                    Log.e(
+                        "ReviewRepositoryImpl",
+                        "Failed to delete images - $backupUris"
+                    )
                 }
-            )
 
-            updatedCount
+                throw e
+            }
         }
 
     override suspend fun getReviewById(id: Long): Result<Review> = runCatching {

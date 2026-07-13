@@ -68,7 +68,7 @@ class ReviewFormViewModel @Inject constructor(
 
     private fun saveReview() {
         viewModelScope.launch {
-            reviewRepository.createReview(_uiState.value.toReview())
+            reviewRepository.upsertReview(_uiState.value.toReview())
                 .onSuccess { id ->
                     _uiEvent.emit(ReviewFormUiEvent.NavigateToDetail(id))
                 }
@@ -78,13 +78,13 @@ class ReviewFormViewModel @Inject constructor(
         }
     }
 
-    private fun deleteReview() {}
-
-    private fun openImagePicker() {
-
+    private fun deleteReview() {
+        TODO()
     }
 
-    private fun openBookmarkSelector() {}
+    private fun openBookmarkSelector() {
+        TODO()
+    }
 
     private fun backStack() = viewModelScope.launch {
         _uiEvent.emit(ReviewFormUiEvent.NavigateToBack)
@@ -96,43 +96,43 @@ class ReviewFormViewModel @Inject constructor(
         }
     }
 
-    fun onTitleChanged(title: String) {
+    private fun onTitleChanged(title: String) {
         _uiState.update { state ->
             state.copy(title = title.trimStart())
         }
     }
 
-    fun onContentChanged(content: String) {
+    private fun onContentChanged(content: String) {
         _uiState.update { state ->
             state.copy(content = content.trimStart())
         }
     }
 
-    fun onShortReviewChanged(shortReview: String) {
+    private fun onShortReviewChanged(shortReview: String) {
         _uiState.update { state ->
             state.copy(shortReview = shortReview.trimStart())
         }
     }
 
-    fun onTagChanged(tag: String) {
+    private fun onTagChanged(tag: String) {
         _uiState.update { state ->
             state.copy(tagInput = tag.trim()) // block empty space
         }
     }
 
-    fun onCreatorNameChanged(creatorName: String) {
+    private fun onCreatorNameChanged(creatorName: String) {
         _uiState.update { state ->
             state.copy(creatorName = creatorName.trimStart())
         }
     }
 
-    fun onRatingChanged(rating: Float) {
+    private fun onRatingChanged(rating: Float) {
         _uiState.update { state ->
             state.copy(rating = rating)
         }
     }
 
-    fun onTagAdded(tag: String) {
+    private fun onTagAdded(tag: String) {
         if (tag.isNotBlank() && !uiState.value.tags.contains(tag)) {
             _uiState.update { state ->
                 state.copy(
@@ -143,32 +143,27 @@ class ReviewFormViewModel @Inject constructor(
         }
     }
 
-    fun onTagRemoved(tag: String) {
+    private fun onTagRemoved(tag: String) {
         _uiState.update { state ->
             state.copy(tags = state.tags - tag)
         }
     }
 
-    private fun validateInput() {}
+    private fun validateInput() {
+        TODO()
+    }
 
-    fun onImageAdded(images: List<Uri>) {
+    private fun onImageAdded(images: List<Uri>) {
         _uiState.update { state ->
             state.copy(images = state.images + images.map { ImageItem(uri = it) })
         }
     }
 
-    fun onImageRemoved(index: Int) {
+    private fun onImageRemoved(index: Int) {
         _uiState.update { state ->
             state.copy(images = state.images.toMutableList().apply {
                 removeAt(index)
             })
         }
     }
-
-    fun onImageRemoved(imageItem: ImageItem) {}
-
-    fun loadBookmarks() {}
-
-    fun applyBookmark(reviewId: Long) {}
-
 }
