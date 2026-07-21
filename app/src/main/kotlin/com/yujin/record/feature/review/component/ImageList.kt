@@ -25,7 +25,8 @@ import coil3.compose.AsyncImage
 @Composable
 fun ImageList(
     images: List<Uri>,
-    onRemoveClick: (Int) -> Unit,
+    editable: Boolean = true,
+    onRemoveClick: (Int) -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     if (images.isEmpty()) return
@@ -47,22 +48,24 @@ fun ImageList(
                     contentScale = ContentScale.Crop,
                 )
 
-                IconButton(
-                    onClick = { onRemoveClick(index) },
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .size(24.dp)
-                        .background(
-                            Color.Black.copy(alpha = 0.6f),
-                            CircleShape
+                if (editable) {
+                    IconButton(
+                        onClick = { onRemoveClick(index) },
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .size(24.dp)
+                            .background(
+                                Color.Black.copy(alpha = 0.6f),
+                                CircleShape
+                            )
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "Remove image",
+                            tint = Color.White,
+                            modifier = Modifier.size(16.dp)
                         )
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Close,
-                        contentDescription = "Remove image",
-                        tint = Color.White,
-                        modifier = Modifier.size(16.dp)
-                    )
+                    }
                 }
             }
         }

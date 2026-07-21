@@ -25,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.yujin.record.core.ui.toDisplayString
+import com.yujin.record.feature.review.component.ImageList
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -121,7 +122,15 @@ fun SuccessScreen(review: ReviewDetailUiState) {
     ) {
         Text(text = review.createdAt.toDisplayString())
 
-        Text(text = review.title, style = MaterialTheme.typography.titleLarge)
+        ImageList(
+            images = review.images.map { it.uri },
+            editable = false
+        )
+
+        Text(
+            text = review.title,
+            style = MaterialTheme.typography.titleLarge
+        )
 
         Text(text = buildString {
             append(review.type.displayName)

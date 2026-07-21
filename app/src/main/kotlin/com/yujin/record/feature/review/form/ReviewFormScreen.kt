@@ -41,8 +41,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.yujin.record.core.model.ReviewType
-import com.yujin.record.core.ui.preview.DefaultScreenPreviews
-import com.yujin.record.core.ui.theme.RecordTheme
 import com.yujin.record.feature.review.component.ImageList
 
 private val REVIEW_TYPE_OPTIONS = ReviewType.entries
@@ -82,7 +80,12 @@ fun ReviewFormScreen(
         modifier = Modifier.fillMaxSize(),
         topBar = {
             TopAppBar(
-                title = { Text(text = "리뷰 작성") },
+                title = {
+                    Text(text =
+                        if (uiState.id == 0L) "리뷰 작성"
+                        else "리뷰 수정"
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = { onAction(ReviewFormUiAction.BackClicked) }) {
                         Icon(
