@@ -81,10 +81,6 @@ fun CalendarScreen(
                                     modifier = Modifier.size(18.dp),
                                 )
                                 Text(text = review.rating.toString())
-                                if (review.shortReview.isNotEmpty()) {
-                                    Text(text = " · ")
-                                    Text(text = review.shortReview)
-                                }
                             }
                         },
                     )

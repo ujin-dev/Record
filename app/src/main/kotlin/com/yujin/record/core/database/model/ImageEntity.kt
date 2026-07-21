@@ -21,8 +21,11 @@ import androidx.room.PrimaryKey
     ]
 )
 data class ImageEntity(
-    @PrimaryKey(autoGenerate = true) val id: Long = 0,
-    @ColumnInfo(name = "review_id") val reviewId: Long,
+    @PrimaryKey(autoGenerate = true)
+    val id: Long = 0,
+    @ColumnInfo(name = "review_id")
+    val reviewId: Long,
     val uri: String,
-    @ColumnInfo(name = "display_order") val displayOrder: Int
+    @ColumnInfo(name = "display_order")
+    val displayOrder: Int
 )

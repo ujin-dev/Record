@@ -9,7 +9,11 @@ import com.yujin.record.core.database.model.ImageEntity
 import com.yujin.record.core.database.model.ReviewEntity
 import com.yujin.record.core.database.util.Converters
 
-@Database(entities = [ReviewEntity::class, ImageEntity::class], version = 1, exportSchema = true)
+@Database(
+    entities = [ReviewEntity::class, ImageEntity::class],
+    version = 1,
+    exportSchema = true
+)
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun reviewDao(): ReviewDao

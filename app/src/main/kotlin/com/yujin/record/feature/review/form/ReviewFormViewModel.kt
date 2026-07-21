@@ -52,7 +52,6 @@ class ReviewFormViewModel @Inject constructor(
             is ReviewFormUiAction.TypeChanged -> onReviewTypeChanged(action.type)
             is ReviewFormUiAction.CreatorNameChanged -> onCreatorNameChanged(action.creatorName)
             is ReviewFormUiAction.ContentChanged -> onContentChanged(action.content)
-            is ReviewFormUiAction.ShortReviewChanged -> onShortReviewChanged(action.shortReview)
             is ReviewFormUiAction.RatingChanged -> onRatingChanged(action.rating)
             is ReviewFormUiAction.ImageAdded -> onImageAdded(action.images)
             is ReviewFormUiAction.ImageRemoved -> onImageRemoved(action.index)
@@ -108,12 +107,6 @@ class ReviewFormViewModel @Inject constructor(
         }
     }
 
-    private fun onShortReviewChanged(shortReview: String) {
-        _uiState.update { state ->
-            state.copy(shortReview = shortReview.trimStart())
-        }
-    }
-
     private fun onTagChanged(tag: String) {
         _uiState.update { state ->
             state.copy(tagInput = tag.trim()) // block empty space
@@ -147,10 +140,6 @@ class ReviewFormViewModel @Inject constructor(
         _uiState.update { state ->
             state.copy(tags = state.tags - tag)
         }
-    }
-
-    private fun validateInput() {
-        TODO()
     }
 
     private fun onImageAdded(images: List<Uri>) {

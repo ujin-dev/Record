@@ -12,7 +12,6 @@ sealed interface ReviewFormUiAction {
     data class TypeChanged(val type: ReviewType) : ReviewFormUiAction
     data class CreatorNameChanged(val creatorName: String) : ReviewFormUiAction
     data class ContentChanged(val content: String) : ReviewFormUiAction
-    data class ShortReviewChanged(val shortReview: String) : ReviewFormUiAction
     data class RatingChanged(val rating: Float) : ReviewFormUiAction
     data class TagChanged(val tag: String) : ReviewFormUiAction
     data class TagAdded(val tag: String) : ReviewFormUiAction

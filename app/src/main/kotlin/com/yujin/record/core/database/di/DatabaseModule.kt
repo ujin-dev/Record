@@ -2,6 +2,7 @@ package com.yujin.record.core.database.di
 
 import android.content.Context
 import androidx.room.Room
+import com.yujin.record.BuildConfig
 import com.yujin.record.core.database.AppDatabase
 import com.yujin.record.core.database.dao.ImageDao
 import com.yujin.record.core.database.dao.ReviewDao
@@ -21,12 +22,14 @@ object DatabaseModule {
     @Singleton
     fun provideAppDatabase(@ApplicationContext context: Context): AppDatabase =
         Room.databaseBuilder(
-            context.applicationContext,
+            context,
             AppDatabase::class.java,
             DATABASE_NAME
-        )
-            .fallbackToDestructiveMigration(true) // TODO use for debug only
-            .build()
+        ).apply {
+            if (BuildConfig.DEBUG) {
+                fallbackToDestructiveMigration(true)
+            }
+        }.build()
 
     @Provides
     fun provideReviewDao(databases: AppDatabase): ReviewDao = databases.reviewDao()

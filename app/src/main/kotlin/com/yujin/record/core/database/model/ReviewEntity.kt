@@ -10,17 +10,20 @@ import kotlin.time.Instant
 @OptIn(ExperimentalTime::class)
 @Entity(tableName = "reviews")
 data class ReviewEntity(
-    @PrimaryKey(autoGenerate = true) val id: Long = 0,
-
+    @PrimaryKey(autoGenerate = true)
+    val id: Long = 0,
     val title: String,
-    @ColumnInfo(name = "creator_name") val creatorName: String = "",
-    @ColumnInfo(name = "short_review") val shortReview: String = "",
+    @ColumnInfo(name = "creator_name")
+    val creatorName: String = "",
     val content: String = "",
-    @ColumnInfo(name = "type") val reviewType: ReviewType,
+    @ColumnInfo(name = "type")
+    val reviewType: ReviewType,
     val tags: List<String> = emptyList(),
     val rating: Float,
-    @ColumnInfo(name = "bookmark_id") val bookmarkId: Long?,
-
-    @ColumnInfo(name = "created_at") val createdAt: Instant,
-    @ColumnInfo(name = "updated_at") val updatedAt: Instant,
+    @ColumnInfo(name = "bookmark_id")
+    val bookmarkId: Long?,
+    @ColumnInfo(name = "created_at")
+    val createdAt: Instant,
+    @ColumnInfo(name = "updated_at")
+    val updatedAt: Instant,
 )

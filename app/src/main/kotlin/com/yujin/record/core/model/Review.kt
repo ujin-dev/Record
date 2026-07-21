@@ -9,7 +9,6 @@ data class Review(
 
     val title: String,
     val creatorName: String = "",
-    val shortReview: String = "",
     val content: String = "",
     val reviewType: ReviewType,
     val rating: Float,

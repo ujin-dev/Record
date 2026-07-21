@@ -132,22 +132,26 @@ fun SuccessScreen(review: ReviewDetailUiState) {
             style = MaterialTheme.typography.titleLarge
         )
 
-        Text(text = buildString {
-            append(review.type.displayName)
-            if (review.creatorName.isNotEmpty()) {
-                append(" · ")
-                append(review.creatorName)
-            }
-        })
-
         Row(verticalAlignment = Alignment.CenterVertically) {
+            // type
+            Text(text = buildString {
+                append(" · ")
+                append(review.type.displayName)
+                append(" · ")
+            })
+            // rating
             Icon(
                 imageVector = Icons.Default.Star,
                 contentDescription = null
             )
             Text(text = review.rating.toString())
-            Text(text = " · ")
-            Text(text = review.shortReview)
+            // creator
+            if (review.creatorName.isNotEmpty()) {
+                Text(text = buildString {
+                    append(" · ")
+                    append(review.creatorName)
+                })
+            }
         }
 
         Text(text = review.content, style = MaterialTheme.typography.titleMedium)

@@ -191,17 +191,6 @@ fun ReviewFormScreen(
                     .height(180.dp)
             )
 
-            // short review
-            OutlinedTextField(
-                value = uiState.shortReview,
-                onValueChange = { onAction(ReviewFormUiAction.ShortReviewChanged(it)) },
-                modifier = Modifier.fillMaxWidth(),
-                label = {
-                    Text("한줄평")
-                },
-                singleLine = true,
-            )
-
             // rating
             // improvement : https://developer.android.com/develop/ui/compose/touch-input/scroll/scroll-modifiers#scrollable-modifier
             Row {
