@@ -9,6 +9,7 @@ import kotlinx.datetime.YearMonth
 interface ReviewRepository {
     suspend fun upsertReview(review: Review): Result<Long>
     suspend fun getReviewById(id: Long): Result<Review>
+    suspend fun deleteReview(reviewId: Long): Result<Unit>
     fun observeReviewsByDate(date: LocalDate): Flow<List<ReviewWithImages>>
     fun observeReviewsByMonth(month: YearMonth): Flow<List<ReviewWithImages>>
 }

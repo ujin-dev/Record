@@ -100,6 +100,16 @@ class ReviewRepositoryImpl @Inject constructor(
         reviewDao.getById(id)?.toReview() ?: throw NoSuchElementException()
     }
 
+    override suspend fun deleteReview(reviewId: Long): Result<Unit> = runCatching {
+        database.withTransaction {
+            val images = imageDao.getByReviewId(reviewId)
+            if (images.isNotEmpty()) {
+                imageStorage.deleteImages(images.map { it.uri.toUri() })
+            }
+            reviewDao.deleteById(reviewId)
+        }
+    }
+
     override fun observeReviewsByDate(date: LocalDate): Flow<List<ReviewWithImages>> {
         val zoneId = ZoneId.systemDefault()
         val start = date.atStartOfDayIn(zoneId.toKotlinTimeZone())

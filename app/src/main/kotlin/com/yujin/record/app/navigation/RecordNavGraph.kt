@@ -46,6 +46,14 @@ fun RecordNavGraph(
                     navController.navigate(RecordRoute.ReviewForm(id))
                 },
                 onBackClick = navController::popBackStack,
+                onDelete = {
+                    navController.navigate(RecordRoute.Calendar) {
+                        popUpTo(navController.graph.id) {
+                            inclusive = true
+                        }
+                        launchSingleTop = true
+                    }
+                }
             )
         }
     }

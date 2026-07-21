@@ -58,7 +58,12 @@ class ReviewDetailViewModel @Inject constructor(
         _uiEvent.emit(ReviewDetailUiEvent.NavigateToForm(reviewId))
     }
 
-    private fun deleteReview() {
-        // todo
+    private fun deleteReview() = viewModelScope.launch {
+        reviewRepository.deleteReview(reviewId)
+            .onSuccess {
+                _uiEvent.emit(ReviewDetailUiEvent.NavigateToHome)
+            }.onFailure {
+                // todo: show toast
+            }
     }
 }

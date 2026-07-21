@@ -10,12 +10,14 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 fun ReviewDetailRoute(
     onEditClick: (Long) -> Unit,
     onBackClick: () -> Unit,
+    onDelete: () -> Unit,
     viewModel: ReviewDetailViewModel = hiltViewModel(),
 ) {
     LaunchedEffect(Unit) {
         viewModel.uiEvent.collect { event ->
             when (event) {
                 ReviewDetailUiEvent.NavigateToBack -> onBackClick()
+                ReviewDetailUiEvent.NavigateToHome -> onDelete()
                 is ReviewDetailUiEvent.NavigateToForm -> onEditClick(event.id)
             }
         }
