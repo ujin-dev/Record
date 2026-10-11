@@ -6,7 +6,7 @@ import kotlinx.datetime.YearMonth
 
 data class CalendarUiState(
     val calendarState : CalendarState,
-    val reviews: List<Review> = emptyList(),
+    val monthlyReviews: List<Review> = emptyList(),
 )
 
 data class CalendarState(

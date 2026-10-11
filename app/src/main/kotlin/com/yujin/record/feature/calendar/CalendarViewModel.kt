@@ -1,17 +1,16 @@
 package com.yujin.record.feature.calendar
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
 import com.yujin.record.core.data.mapper.toReview
 import com.yujin.record.core.data.repository.ReviewRepository
 import com.yujin.record.core.model.Review
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -36,16 +35,17 @@ import kotlin.time.Clock
 class CalendarViewModel @Inject constructor(
     private val reviewRepository: ReviewRepository
 ) : ViewModel() {
-    private val selectedDate = MutableStateFlow(
+    private val selectedDate: MutableStateFlow<LocalDate> = MutableStateFlow(
         Clock.System.now()
             .toLocalDateTime(TimeZone.currentSystemDefault())
             .date
     )
 
-    private val currentMonth = MutableStateFlow(selectedDate.value.toYearMonth())
+    private val currentMonth: MutableStateFlow<YearMonth> =
+        MutableStateFlow(selectedDate.value.toYearMonth())
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    private val reviewsForMonth =
+    private val monthlyReviews: Flow<List<Review>> =
         currentMonth
             .flatMapLatest { month ->
                 reviewRepository.observeReviewsByMonth(month)
@@ -57,7 +57,7 @@ class CalendarViewModel @Inject constructor(
         combine(
             currentMonth,
             selectedDate,
-            reviewsForMonth,
+            monthlyReviews,
         ) { month, date, reviews ->
             CalendarUiState(
                 calendarState = CalendarState(
@@ -65,7 +65,7 @@ class CalendarViewModel @Inject constructor(
                     selectedDate = date,
                     calendarDays = buildCalendar(month, reviews),
                 ),
-                reviews = reviews,
+                monthlyReviews = reviews,
             )
         }.stateIn(
             scope = viewModelScope,
@@ -76,12 +76,12 @@ class CalendarViewModel @Inject constructor(
                     selectedDate = selectedDate.value,
                     calendarDays = buildCalendar(currentMonth.value, emptyList()),
                 ),
-                reviews = emptyList()
+                monthlyReviews = emptyList()
             )
         )
 
-    private val _uiEvent = MutableSharedFlow<CalendarUiEvent>()
-    val uiEvent = _uiEvent.asSharedFlow()
+    private val _uiEvent: MutableSharedFlow<CalendarUiEvent> = MutableSharedFlow()
+    val uiEvent: SharedFlow<CalendarUiEvent> = _uiEvent.asSharedFlow()
 
     fun onAction(action: CalendarUiAction) {
         when (action) {

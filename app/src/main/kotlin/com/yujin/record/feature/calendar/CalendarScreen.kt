@@ -63,7 +63,7 @@ fun CalendarScreen(
             HorizontalDivider()
 
             LazyColumn {
-                items(uiState.reviews) { review ->
+                items(uiState.monthlyReviews) { review ->
                     ListItem(
                         modifier = Modifier.clickable(onClick = {
                             onAction(
