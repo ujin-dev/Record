@@ -77,7 +77,9 @@ fun CalendarPager(
                             is CalendarCellUiState.Active -> {
                                 CalendarCell(
                                     modifier = cellModifier,
-                                    state = day,
+                                    date = day.date.day,
+                                    thumbnailUri = day.thumbnailUri,
+                                    reviewCount = day.reviewCount,
                                     selected = day.date == state.selectedDate,
                                     onClick = { onAction(CalendarUiAction.DateClicked(day.date)) },
                                 )

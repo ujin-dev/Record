@@ -133,7 +133,7 @@ class CalendarViewModel @Inject constructor(
                 CalendarCellUiState.Active(
                     date = date,
                     reviewCount = reviewsByDate[date]?.size ?: 0,
-                    thumbnailUrl = null, // TODO
+                    thumbnailUri = reviewsByDate[date]?.lastOrNull()?.images?.firstOrNull()?.uri
                 )
             } else {
                 CalendarCellUiState.Empty

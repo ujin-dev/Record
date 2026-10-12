@@ -1,11 +1,12 @@
 package com.yujin.record.feature.calendar
 
+import android.net.Uri
 import com.yujin.record.core.model.Review
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.YearMonth
 
 data class CalendarUiState(
-    val calendarState : CalendarState,
+    val calendarState: CalendarState,
     val monthlyReviews: List<Review> = emptyList(),
 )
 
@@ -19,7 +20,7 @@ sealed interface CalendarCellUiState {
     data class Active(
         val date: LocalDate,
         val reviewCount: Int,
-        val thumbnailUrl: String?,
+        val thumbnailUri: Uri?,
     ) : CalendarCellUiState
 
     data object Empty : CalendarCellUiState
