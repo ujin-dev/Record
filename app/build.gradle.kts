@@ -10,7 +10,7 @@ plugins {
 android {
     namespace = "com.yujin.record"
     compileSdk {
-        version = release(36) {
+        version = release(37) {
             minorApiLevel = 1
         }
     }
@@ -61,6 +61,7 @@ dependencies {
     implementation(libs.androidx.core.splashscreen)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.ui)
     implementation(libs.kotlinx.serialization.json)
 
     ksp(libs.androidx.room.compiler)
