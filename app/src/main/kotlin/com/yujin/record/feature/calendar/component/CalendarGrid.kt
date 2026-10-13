@@ -13,6 +13,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.yujin.record.core.ui.MEDIA_COVER_ASPECT_RATIO
 import com.yujin.record.feature.calendar.CalendarCellUiState
 import com.yujin.record.feature.calendar.CalendarUiAction
 import com.yujin.record.feature.calendar.firstDay
@@ -62,7 +63,7 @@ fun CalendarGrid(
                         Box(
                             modifier = Modifier
                                 .weight(1f)
-                                .aspectRatio(0.7f)
+                                .aspectRatio(MEDIA_COVER_ASPECT_RATIO)
                         )
                     } else {
                         val cellState = state?.get(day)
@@ -70,7 +71,7 @@ fun CalendarGrid(
                         CalendarCell(
                             modifier = Modifier
                                 .weight(1f)
-                                .aspectRatio(0.7f),
+                                .aspectRatio(MEDIA_COVER_ASPECT_RATIO),
                             date = day.day,
                             thumbnailUri = cellState?.thumbnailUrl,
                             reviewCount = cellState?.reviewCount ?: 0,
