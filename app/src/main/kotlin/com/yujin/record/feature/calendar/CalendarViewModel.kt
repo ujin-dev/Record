@@ -19,16 +19,11 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.YearMonth
-import kotlinx.datetime.minus
-import kotlinx.datetime.plus
-import kotlinx.datetime.toJavaDayOfWeek
 import kotlinx.datetime.toLocalDateTime
 import javax.inject.Inject
-import kotlin.math.ceil
 import kotlin.time.Clock
 
 @HiltViewModel
@@ -60,23 +55,27 @@ class CalendarViewModel @Inject constructor(
             monthlyReviews,
         ) { month, date, reviews ->
             CalendarUiState(
-                calendarState = CalendarState(
+                calendarState = CalendarContentUiState(
                     displayedYearMonth = month,
-                    selectedDate = date,
-                    calendarDays = buildCalendar(month, reviews),
+                    cellStatesByDate = reviews
+                        .groupBy { it.createdAt.toLocalDate() }
+                        .mapValues { (date, reviews) ->
+                            CalendarCellUiState(
+                                date = date,
+                                reviewCount = reviews.size,
+                                thumbnailUrl = reviews.lastOrNull()?.images?.firstOrNull()?.uri
+                            )
+                        }
                 ),
-                monthlyReviews = reviews,
+                monthlyReviews = reviews
             )
         }.stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),
             initialValue = CalendarUiState(
-                calendarState = CalendarState(
+                calendarState = CalendarContentUiState(
                     displayedYearMonth = currentMonth.value,
-                    selectedDate = selectedDate.value,
-                    calendarDays = buildCalendar(currentMonth.value, emptyList()),
-                ),
-                monthlyReviews = emptyList()
+                )
             )
         )
 
@@ -109,35 +108,6 @@ class CalendarViewModel @Inject constructor(
     fun onReviewClick(reviewId: Long) {
         viewModelScope.launch {
             _uiEvent.emit(CalendarUiEvent.NavigateToDetail(reviewId))
-        }
-    }
-
-    fun buildCalendar(
-        month: YearMonth,
-        reviews: List<Review>,
-    ): List<CalendarCellUiState> {
-        val firstDay = month.firstDay()
-        val startOffset = firstDay.dayOfWeek.toJavaDayOfWeek().value % 7
-        val daysInMonth = month.numberOfDays
-        val weekCount = ceil((startOffset + daysInMonth) / 7f).toInt()
-        val totalCellCount = weekCount * 7
-        val startDate = firstDay - DatePeriod(days = startOffset)
-        val reviewsByDate = reviews.groupBy {
-            it.createdAt.toLocalDateTime(TimeZone.currentSystemDefault()).date
-        }
-
-        return (0 until totalCellCount).map { index ->
-            val date = startDate + DatePeriod(days = index)
-
-            if (date.toYearMonth() == month) {
-                CalendarCellUiState.Active(
-                    date = date,
-                    reviewCount = reviewsByDate[date]?.size ?: 0,
-                    thumbnailUri = reviewsByDate[date]?.lastOrNull()?.images?.firstOrNull()?.uri
-                )
-            } else {
-                CalendarCellUiState.Empty
-            }
         }
     }
 }

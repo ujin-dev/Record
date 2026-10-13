@@ -19,7 +19,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 
 @Composable
@@ -28,10 +27,16 @@ fun CalendarCell(
     date: Int,
     thumbnailUri: Uri? = null,
     reviewCount: Int = 0,
-    selected: Boolean = false,
     onClick: () -> Unit = {}
 ) {
-    Box(modifier = modifier.clickable(onClick = onClick)) {
+    Box(
+        modifier = modifier
+            .background(
+                color = MaterialTheme.colorScheme.surfaceContainer,
+                shape = RoundedCornerShape(8.dp)
+            )
+            .clickable(onClick = onClick)
+    ) {
         if (thumbnailUri != null) {
             AsyncImage(
                 model = thumbnailUri,
@@ -45,7 +50,9 @@ fun CalendarCell(
             Text(
                 text = "$date",
                 modifier = Modifier.align(Center),
-                fontWeight = if (selected) FontWeight.ExtraBold else FontWeight.Normal,
+                color = MaterialTheme.colorScheme.onSurface,
+                fontWeight = FontWeight.ExtraBold,
+                style = MaterialTheme.typography.labelLarge
             )
         }
 
@@ -61,7 +68,6 @@ fun CalendarCell(
                     Text(
                         text = "$reviewCount",
                         color = MaterialTheme.colorScheme.onTertiaryContainer,
-                        fontSize = 12.sp,
                         fontWeight = FontWeight.ExtraBold,
                         style = MaterialTheme.typography.labelSmall,
                     )

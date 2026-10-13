@@ -6,22 +6,17 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.YearMonth
 
 data class CalendarUiState(
-    val calendarState: CalendarState,
+    val calendarState: CalendarContentUiState,
     val monthlyReviews: List<Review> = emptyList(),
 )
 
-data class CalendarState(
+data class CalendarContentUiState(
     val displayedYearMonth: YearMonth,
-    val selectedDate: LocalDate,
-    val calendarDays: List<CalendarCellUiState> = emptyList(),
+    val cellStatesByDate: Map<LocalDate, CalendarCellUiState> = emptyMap()
 )
 
-sealed interface CalendarCellUiState {
-    data class Active(
-        val date: LocalDate,
-        val reviewCount: Int,
-        val thumbnailUri: Uri?,
-    ) : CalendarCellUiState
-
-    data object Empty : CalendarCellUiState
-}
+data class CalendarCellUiState(
+    val date: LocalDate,
+    val reviewCount: Int = 0,
+    val thumbnailUrl: Uri? = null,
+)
