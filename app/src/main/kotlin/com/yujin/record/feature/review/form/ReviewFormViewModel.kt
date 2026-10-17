@@ -108,9 +108,7 @@ class ReviewFormViewModel @Inject constructor(
     }
 
     private fun onTagChanged(tag: String) {
-        _uiState.update { state ->
-            state.copy(tagInput = tag.trim()) // block empty space
-        }
+        _uiState.update { state -> state.copy(tagInput = tag.trim()) }
     }
 
     private fun onCreatorNameChanged(creatorName: String) {
@@ -125,11 +123,17 @@ class ReviewFormViewModel @Inject constructor(
         }
     }
 
-    private fun onTagAdded(tag: String) {
-        if (tag.isNotBlank() && !uiState.value.tags.contains(tag)) {
+    private fun onTagAdded(tagContent: String) {
+        val currentTags = uiState.value.tags
+
+        val newTags = tagContent.split(Regex("[,\\s]+"))
+            .filter { it.isNotEmpty() && !currentTags.contains(it) }
+            .distinct()
+
+        if (newTags.isNotEmpty()) {
             _uiState.update { state ->
                 state.copy(
-                    tags = state.tags + tag,
+                    tags = state.tags + newTags,
                     tagInput = "",
                 )
             }
