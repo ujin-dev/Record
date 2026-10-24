@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
@@ -27,8 +28,9 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
@@ -77,7 +79,14 @@ fun ReviewDetailScreen(
                 scrolledContainerColor = Color.Transparent
             ),
             navigationIcon = {
-                IconButton(onClick = { onAction(ReviewDetailUiAction.BackClicked) }) {
+                FilledIconButton(
+                    onClick = { onAction(ReviewDetailUiAction.BackClicked) },
+                    colors = IconButtonDefaults.iconButtonColors(
+                        containerColor = Color.White.copy(alpha = 0.6f),
+                        contentColor = MaterialTheme.colorScheme.primary
+                    ),
+                    shape = CircleShape,
+                ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
                         contentDescription = "뒤로가기"
@@ -86,20 +95,30 @@ fun ReviewDetailScreen(
             },
             actions = {
                 if (uiState is ReviewDetailScreenState.Success) {
-                    IconButton(
+                    FilledIconButton(
                         onClick = {
                             onAction(ReviewDetailUiAction.EditClicked)
                         },
+                        colors = IconButtonDefaults.iconButtonColors(
+                            containerColor = Color.White.copy(alpha = 0.6f),
+                            contentColor = MaterialTheme.colorScheme.primary
+                        ),
+                        shape = CircleShape,
                     ) {
                         Icon(
                             imageVector = Icons.Default.Edit,
                             contentDescription = "수정하기"
                         )
                     }
-                    IconButton(
+                    FilledIconButton(
                         onClick = {
                             onAction(ReviewDetailUiAction.DeleteClicked)
                         },
+                        colors = IconButtonDefaults.iconButtonColors(
+                            containerColor = Color.White.copy(alpha = 0.6f),
+                            contentColor = MaterialTheme.colorScheme.primary
+                        ),
+                        shape = CircleShape,
                     ) {
                         Icon(
                             imageVector = Icons.Default.Delete,
