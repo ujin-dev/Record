@@ -240,7 +240,7 @@ fun ReviewFormScreen(
                 FormField(
                     value = uiState.creatorName,
                     onValueChange = { onAction(ReviewFormUiAction.CreatorNameChanged(it)) },
-                    label = if (uiState.type == ReviewType.MOVIE) "감독" else "저자",
+                    label = if (uiState.type == ReviewType.MOVIE) "제작자" else "저자",
                     placeholder = "이름을 입력하세요",
                     imeAction = ImeAction.Next,
                 )

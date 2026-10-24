@@ -240,6 +240,11 @@ fun ContentView(
             fontWeight = FontWeight.ExtraBold,
             style = MaterialTheme.typography.headlineLarge,
         )
+        Text(
+            text = uiState.review.createdAt.toDisplayString(),
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            style = MaterialTheme.typography.bodySmall,
+        )
 
         Spacer(Modifier.height(10.dp))
 
@@ -249,14 +254,6 @@ fun ContentView(
                 style = MaterialTheme.typography.bodyLarge,
             )
         }
-
-        Text(
-            text = uiState.review.createdAt.toDisplayString(),
-            style = MaterialTheme.typography.bodyMedium,
-        )
-
-        Spacer(Modifier.height(10.dp))
-
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
                 text = uiState.review.type.displayName,
