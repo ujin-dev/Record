@@ -30,6 +30,7 @@ import kotlin.math.ceil
 fun CalendarGrid(
     month: YearMonth,
     state: Map<LocalDate, CalendarCellUiState>? = null,
+    selectedDate : LocalDate,
     onAction: (CalendarUiAction) -> Unit,
 ) {
     val firstDay = month.firstDay()
@@ -58,24 +59,25 @@ fun CalendarGrid(
                 modifier = Modifier.padding(horizontal = 8.dp),
                 horizontalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                week.forEach { day ->
-                    if (day == null) {
+                week.forEach { localDate ->
+                    if (localDate == null) {
                         Box(
                             modifier = Modifier
                                 .weight(1f)
                                 .aspectRatio(MEDIA_COVER_ASPECT_RATIO)
                         )
                     } else {
-                        val cellState = state?.get(day)
+                        val cellState = state?.get(localDate)
 
-                        CalendarCell(
+                        DateCell(
                             modifier = Modifier
                                 .weight(1f)
                                 .aspectRatio(MEDIA_COVER_ASPECT_RATIO),
-                            date = day.day,
+                            date = localDate.day,
+                            isSelected = localDate == selectedDate,
                             thumbnailUri = cellState?.thumbnailUrl,
                             reviewCount = cellState?.reviewCount ?: 0,
-                            onClick = { onAction(CalendarUiAction.DateClicked(day)) },
+                            onClick = { onAction(CalendarUiAction.DateClicked(localDate)) },
                         )
                     }
                 }

@@ -15,6 +15,7 @@ import com.yujin.record.feature.calendar.CalendarUiAction
 import com.yujin.record.feature.calendar.firstDay
 import kotlinx.coroutines.flow.map
 import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.LocalDate
 import kotlinx.datetime.YearMonth
 import kotlinx.datetime.isoDayNumber
 import kotlinx.datetime.number
@@ -36,6 +37,7 @@ private fun getWeekCount(month: YearMonth): Int {
 @Composable
 fun CalendarPager(
     state: CalendarContentUiState,
+    selectedDate: LocalDate,
     onAction: (CalendarUiAction) -> Unit,
 ) {
     val anchorYearMonth = remember { state.displayedYearMonth }
@@ -45,7 +47,7 @@ fun CalendarPager(
         pageCount = { RANGE },
     )
 
-    val weekCount = remember { mutableIntStateOf(getWeekCount(state.displayedYearMonth)) }
+//    val weekCount = remember { mutableIntStateOf(getWeekCount(state.displayedYearMonth)) }
 
     LaunchedEffect(state.displayedYearMonth) {
         val targetPage = BASE_PAGE + betweenMonth(anchorYearMonth, state.displayedYearMonth)
@@ -65,13 +67,13 @@ fun CalendarPager(
             }
     }
 
-    LaunchedEffect(pagerState) {
-        snapshotFlow { pagerState.settledPage }
-            .collect { page ->
-                val targetMonth = anchorYearMonth.plus(page - BASE_PAGE, DateTimeUnit.MONTH)
-                weekCount.intValue = getWeekCount(targetMonth)
-            }
-    }
+//    LaunchedEffect(pagerState) {
+//        snapshotFlow { pagerState.settledPage }
+//            .collect { page ->
+//                val targetMonth = anchorYearMonth.plus(page - BASE_PAGE, DateTimeUnit.MONTH)
+//                weekCount.intValue = getWeekCount(targetMonth)
+//            }
+//    }
 
     HorizontalPager(
         state = pagerState,
@@ -83,6 +85,7 @@ fun CalendarPager(
         CalendarGrid(
             month = month,
             state = if (state.displayedYearMonth == month) state.cellStatesByDate else null,
+            selectedDate = selectedDate,
             onAction = onAction,
         )
     }

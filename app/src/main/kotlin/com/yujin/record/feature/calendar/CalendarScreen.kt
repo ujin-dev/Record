@@ -57,6 +57,7 @@ fun CalendarScreen(
 
             CalendarPager(
                 state = uiState.calendarState,
+                selectedDate = uiState.selectedDate,
                 onAction = onAction,
             )
 

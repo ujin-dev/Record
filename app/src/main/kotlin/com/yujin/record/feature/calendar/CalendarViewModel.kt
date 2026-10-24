@@ -55,6 +55,7 @@ class CalendarViewModel @Inject constructor(
             monthlyReviews,
         ) { month, date, reviews ->
             CalendarUiState(
+                selectedDate = date,
                 calendarState = CalendarContentUiState(
                     displayedYearMonth = month,
                     cellStatesByDate = reviews
@@ -73,6 +74,7 @@ class CalendarViewModel @Inject constructor(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),
             initialValue = CalendarUiState(
+                selectedDate = selectedDate.value,
                 calendarState = CalendarContentUiState(
                     displayedYearMonth = currentMonth.value,
                 )
@@ -96,7 +98,7 @@ class CalendarViewModel @Inject constructor(
     }
 
     fun onDateClick(date: LocalDate) {
-        // TODO
+        selectedDate.value = date
     }
 
     fun onCreateReviewClick() {
