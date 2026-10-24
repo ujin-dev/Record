@@ -6,7 +6,7 @@ import kotlin.time.Instant
 import kotlin.time.toJavaInstant
 
 
-private val pattern = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+private val pattern = DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm:ss")
 
 fun Instant.toDisplayString(): String = pattern
     .withZone(ZoneId.systemDefault())

@@ -103,7 +103,9 @@ class CalendarViewModel @Inject constructor(
 
     fun onCreateReviewClick() {
         viewModelScope.launch {
-            _uiEvent.emit(CalendarUiEvent.NavigateToCreate)
+            _uiEvent.emit(
+                CalendarUiEvent.NavigateToCreate(selectedDate.value.toString())
+            )
         }
     }
 

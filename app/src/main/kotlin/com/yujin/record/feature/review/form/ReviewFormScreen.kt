@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -88,6 +87,7 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.yujin.record.core.model.ReviewType
 import com.yujin.record.core.ui.theme.Dimens
+import com.yujin.record.core.ui.toDisplayString
 
 private const val MAX_IMAGE_COUNT = 3
 
@@ -138,6 +138,11 @@ fun ReviewFormScreen(
                             text = if (uiState.id == 0L) "리뷰 작성" else "리뷰 수정",
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.SemiBold,
+                        )
+                        Text(
+                            text = uiState.createdAt.toDisplayString(),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 },

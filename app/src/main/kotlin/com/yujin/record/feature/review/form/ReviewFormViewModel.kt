@@ -9,6 +9,7 @@ import com.yujin.record.app.navigation.RecordRoute
 import com.yujin.record.core.data.repository.ReviewRepository
 import com.yujin.record.core.model.ImageItem
 import com.yujin.record.core.model.ReviewType
+import com.yujin.record.feature.calendar.toInstant
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,6 +18,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.datetime.LocalDate
 import javax.inject.Inject
 
 @HiltViewModel
@@ -30,11 +32,20 @@ class ReviewFormViewModel @Inject constructor(
     private val _uiEvent = MutableSharedFlow<ReviewFormUiEvent>()
     val uiEvent = _uiEvent.asSharedFlow()
 
-    private var currentReviewId: Long? =
-        savedStateHandle.toRoute<RecordRoute.ReviewForm>().reviewId
-
     init {
-        currentReviewId?.let(::loadReview)
+        initFromRoute(savedStateHandle.toRoute<RecordRoute.ReviewForm>())
+    }
+
+    private fun initFromRoute(route: RecordRoute.ReviewForm) {
+        when {
+            route.reviewId != null -> loadReview(route.reviewId)
+            route.createdDate != null -> {
+                val date = LocalDate.parse(route.createdDate)
+                _uiState.update { currentState ->
+                    currentState.copy(createdAt = date.toInstant())
+                }
+            }
+        }
     }
 
     private fun loadReview(reviewId: Long) = viewModelScope.launch {

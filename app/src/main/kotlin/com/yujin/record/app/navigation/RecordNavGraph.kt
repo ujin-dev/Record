@@ -7,6 +7,8 @@ import androidx.navigation.compose.composable
 import com.yujin.record.feature.calendar.CalendarRoute
 import com.yujin.record.feature.review.detail.ReviewDetailRoute
 import com.yujin.record.feature.review.form.ReviewFormRoute
+import kotlinx.datetime.LocalDate
+import kotlin.reflect.typeOf
 
 @Composable
 fun RecordNavGraph(
@@ -18,8 +20,8 @@ fun RecordNavGraph(
     ) {
         composable<RecordRoute.Calendar> {
             CalendarRoute(
-                onNavigateToCreate = {
-                    navController.navigate(RecordRoute.ReviewForm())
+                onNavigateToCreate = { createdDate ->
+                    navController.navigate(RecordRoute.ReviewForm(createdDate = createdDate))
                 },
                 onNavigateToDetail = { id ->
                     navController.navigate(RecordRoute.ReviewDetail(id))
@@ -43,7 +45,7 @@ fun RecordNavGraph(
         composable<RecordRoute.ReviewDetail> {
             ReviewDetailRoute(
                 onEditClick = { id ->
-                    navController.navigate(RecordRoute.ReviewForm(id))
+                    navController.navigate(RecordRoute.ReviewForm(reviewId = id))
                 },
                 onBackClick = navController::popBackStack,
                 onDelete = {

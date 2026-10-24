@@ -5,17 +5,18 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.datetime.LocalDate
 
 @Composable
 fun CalendarRoute(
-    onNavigateToCreate: () -> Unit,
+    onNavigateToCreate: (String) -> Unit,
     onNavigateToDetail: (Long) -> Unit,
     viewModel: CalendarViewModel = hiltViewModel()
 ) {
     LaunchedEffect(Unit) {
         viewModel.uiEvent.collect { event ->
             when (event) {
-                is CalendarUiEvent.NavigateToCreate -> onNavigateToCreate()
+                is CalendarUiEvent.NavigateToCreate -> onNavigateToCreate(event.createdDate)
                 is CalendarUiEvent.NavigateToDetail -> onNavigateToDetail(event.reviewId)
             }
         }

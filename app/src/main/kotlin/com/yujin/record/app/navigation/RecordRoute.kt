@@ -9,7 +9,8 @@ sealed interface RecordRoute {
 
     @Serializable
     data class ReviewForm(
-        val reviewId: Long? = null
+        val reviewId: Long? = null,
+        val createdDate: String? = null
     ) : RecordRoute
 
     @Serializable
