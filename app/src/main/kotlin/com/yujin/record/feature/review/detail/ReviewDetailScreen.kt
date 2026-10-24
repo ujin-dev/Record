@@ -241,10 +241,12 @@ fun ContentView(
             style = MaterialTheme.typography.headlineLarge,
         )
 
+        Spacer(Modifier.height(10.dp))
+
         if (uiState.review.creatorName.isNotEmpty()) {
             Text(
                 text = uiState.review.creatorName,
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.bodyLarge,
             )
         }
 
@@ -256,19 +258,29 @@ fun ContentView(
         Spacer(Modifier.height(10.dp))
 
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(text = buildString {
-                append(uiState.review.type.displayName)
-                append(" · ")
-            }, style = MaterialTheme.typography.bodyMedium)
+            Text(
+                text = uiState.review.type.displayName,
+                style = MaterialTheme.typography.bodyLarge
+            )
+            Text(text = " · ", fontWeight = FontWeight.ExtraBold)
             // rating
             Icon(
                 imageVector = Icons.Default.Star,
-                contentDescription = null
+                contentDescription = null,
+                modifier = Modifier.size(16.dp),
             )
             Text(
                 text = uiState.review.rating.toString(),
-                style = MaterialTheme.typography.bodyMedium
+                style = MaterialTheme.typography.bodyLarge
             )
+        }
+
+        Spacer(Modifier.height(15.dp))
+
+        Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
+            uiState.review.tags.forEach { tag ->
+                Text(text = "#$tag")
+            }
         }
 
         Spacer(Modifier.height(15.dp))
