@@ -40,9 +40,9 @@ class ReviewFormViewModel @Inject constructor(
         when {
             route.reviewId != null -> loadReview(route.reviewId)
             route.createdDate != null -> {
-                val date = LocalDate.parse(route.createdDate)
+                val date = LocalDate.parse(route.createdDate).toInstant()
                 _uiState.update { currentState ->
-                    currentState.copy(createdAt = date.toInstant())
+                    currentState.copy(createdAt = date, updatedAt = date)
                 }
             }
         }
@@ -78,11 +78,18 @@ class ReviewFormViewModel @Inject constructor(
 
     private fun saveReview() {
         viewModelScope.launch {
-            reviewRepository.upsertReview(_uiState.value.toReview())
+            val review = _uiState.value.toReview()
+            val result = if (review.id == 0L) {
+                reviewRepository.insertReview(review)
+            } else {
+                reviewRepository.updateReview(review).map { review.id }
+            }
+
+            result
                 .onSuccess { id ->
                     _uiEvent.emit(ReviewFormUiEvent.NavigateToDetail(id))
                 }
-                .onFailure { e ->
+                .onFailure {
                     _uiEvent.emit(ReviewFormUiEvent.ShowToast("저장에 실패했습니다."))
                 }
         }
@@ -119,7 +126,7 @@ class ReviewFormViewModel @Inject constructor(
     }
 
     private fun onTagChanged(tag: String) {
-        _uiState.update { state -> state.copy(tagInput = tag.trim()) }
+        _uiState.update { state -> state.copy(tagInput = tag.trimStart()) }
     }
 
     private fun onCreatorNameChanged(creatorName: String) {

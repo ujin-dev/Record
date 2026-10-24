@@ -21,7 +21,6 @@ import kotlinx.datetime.plus
 import kotlinx.datetime.toKotlinTimeZone
 import java.time.ZoneId
 import javax.inject.Inject
-import kotlin.time.Clock
 
 class ReviewRepositoryImpl @Inject constructor(
     private val database: AppDatabase,
@@ -30,25 +29,49 @@ class ReviewRepositoryImpl @Inject constructor(
     private val imageStorage: ImageStorage,
 ) : ReviewRepository {
 
-    override suspend fun upsertReview(review: Review): Result<Long> =
+    override suspend fun insertReview(review: Review): Result<Long> =
         runCatching {
             val backupUris = mutableListOf<Uri>()
-            val isCreate = review.id == 0L
 
             try {
                 database.withTransaction {
-                    val now = Clock.System.now()
+                    val reviewId = reviewDao.insert(review.toEntity())
 
-                    val reviewId = reviewDao.upsert(
-                        review.toEntity(
-                            createdAt = if (isCreate) now else review.createdAt,
-                            updatedAt = now
-                        )
-                    ).takeIf { it != -1L } ?: review.id
+                    val imageEntities = review.images.mapIndexed { index, item ->
+                        val backupUri = imageStorage.backupImage(item.uri)
+                            .also(backupUris::add)
+                        item.copy(uri = backupUri).toEntity(reviewId, index + 1)
+                    }
 
-                    val oldImages =
-                        if (isCreate) listOf()
-                        else imageDao.getByReviewId(review.id)
+                    imageDao.insertAll(imageEntities)
+
+                    reviewId
+                }
+            } catch (e: Exception) {
+                runCatching {
+                    if (backupUris.isNotEmpty()) {
+                        imageStorage.deleteImages(backupUris)
+                    }
+                }.onFailure {
+                    Log.e(
+                        "ReviewRepositoryImpl",
+                        "Failed to delete images - $backupUris"
+                    )
+                }
+
+                throw e
+            }
+        }
+
+    override suspend fun updateReview(review: Review): Result<Unit> =
+        runCatching {
+            val backupUris = mutableListOf<Uri>()
+
+            try {
+                database.withTransaction {
+                    reviewDao.update(review.toEntity())
+
+                    val oldImages = imageDao.getByReviewId(review.id)
 
                     val deleteUris =
                         if (oldImages.isNotEmpty()) {
@@ -66,7 +89,7 @@ class ReviewRepositoryImpl @Inject constructor(
                                 imageStorage.backupImage(item.uri).also(backupUris::add)
                             }
 
-                        item.copy(uri = backupUri).toEntity(reviewId, index + 1)
+                        item.copy(uri = backupUri).toEntity(review.id, index + 1)
                     }
 
                     if (oldImages.isNotEmpty()) {
@@ -77,8 +100,6 @@ class ReviewRepositoryImpl @Inject constructor(
                     if (deleteUris.isNotEmpty()) {
                         imageStorage.deleteImages(deleteUris.toList())
                     }
-
-                    reviewId
                 }
             } catch (e: Exception) {
                 runCatching {

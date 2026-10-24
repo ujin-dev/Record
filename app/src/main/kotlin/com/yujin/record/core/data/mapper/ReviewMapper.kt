@@ -5,18 +5,19 @@ import com.yujin.record.core.database.model.ReviewWithImages
 import com.yujin.record.core.model.Review
 import kotlin.time.Instant
 
-fun Review.toEntity(createdAt: Instant, updatedAt: Instant) = ReviewEntity(
-    id = id,
-    title = title,
-    creatorName = creatorName,
-    content = content,
-    reviewType = reviewType,
-    tags = tags,
-    rating = rating,
-    bookmarkId = bookmarkId,
-    createdAt = createdAt,
-    updatedAt = updatedAt,
-)
+fun Review.toEntity() =
+    ReviewEntity(
+        id = id,
+        title = title,
+        creatorName = creatorName,
+        content = content,
+        reviewType = reviewType,
+        tags = tags,
+        rating = rating,
+        bookmarkId = bookmarkId,
+        createdAt = createdAt,
+        updatedAt = updatedAt,
+    )
 
 fun ReviewWithImages.toReview() = Review(
     id = review.id,

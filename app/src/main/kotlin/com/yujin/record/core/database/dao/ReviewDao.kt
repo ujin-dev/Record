@@ -14,8 +14,11 @@ import kotlin.time.Instant
 
 @Dao
 interface ReviewDao {
-    @Upsert
-    suspend fun upsert(review: ReviewEntity): Long
+    @Insert
+    suspend fun insert(review: ReviewEntity): Long
+
+    @Update
+    suspend fun update(review: ReviewEntity): Unit
 
     @Query("DELETE FROM reviews WHERE id = :reviewId")
     suspend fun deleteById(reviewId: Long): Int
