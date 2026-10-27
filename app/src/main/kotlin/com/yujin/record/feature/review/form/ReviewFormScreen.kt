@@ -471,14 +471,14 @@ fun SelectedImageItem(imageUri: Uri, onRemove: () -> Unit, modifier: Modifier = 
                     .padding(6.dp)
                     .size(32.dp)
                     .background(
-                        Color.White.copy(alpha = 0.6f),
+                        Color.Black.copy(alpha = 0.6f),
                         CircleShape
                     )
             ) {
                 Icon(
                     imageVector = Icons.Default.Close,
                     contentDescription = "remove icon",
-                    tint = Color.DarkGray,
+                    tint = Color.White,
                     modifier = Modifier.size(20.dp)
                 )
             }
