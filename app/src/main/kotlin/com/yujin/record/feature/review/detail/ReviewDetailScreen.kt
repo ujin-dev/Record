@@ -1,7 +1,9 @@
 package com.yujin.record.feature.review.detail
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.net.Uri
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -39,16 +41,20 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.view.WindowCompat
 import coil3.compose.AsyncImage
 import com.yujin.record.core.ui.MEDIA_COVER_ASPECT_RATIO
 import com.yujin.record.core.ui.toDisplayString
@@ -60,6 +66,21 @@ fun ReviewDetailScreen(
     uiState: ReviewDetailScreenState,
     onAction: (ReviewDetailUiAction) -> Unit,
 ) {
+
+    val view = LocalView.current
+    val window = (view.context as Activity).window
+
+    DisposableEffect(window) {
+        val controller = WindowCompat.getInsetsController(window, view)
+        val previousAppearance = controller.isAppearanceLightStatusBars
+
+        controller.isAppearanceLightStatusBars = false
+
+        onDispose {
+            controller.isAppearanceLightStatusBars = previousAppearance
+        }
+    }
+
     Box {
         when (uiState) {
             ReviewDetailScreenState.Loading -> LoadingScreen()
@@ -83,7 +104,7 @@ fun ReviewDetailScreen(
                     onClick = { onAction(ReviewDetailUiAction.BackClicked) },
                     colors = IconButtonDefaults.iconButtonColors(
                         containerColor = Color.White.copy(alpha = 0.6f),
-                        contentColor = MaterialTheme.colorScheme.primary
+                        contentColor = MaterialTheme.colorScheme.onSurfaceVariant
                     ),
                     shape = CircleShape,
                 ) {
@@ -101,7 +122,7 @@ fun ReviewDetailScreen(
                         },
                         colors = IconButtonDefaults.iconButtonColors(
                             containerColor = Color.White.copy(alpha = 0.6f),
-                            contentColor = MaterialTheme.colorScheme.primary
+                            contentColor = MaterialTheme.colorScheme.onSurfaceVariant
                         ),
                         shape = CircleShape,
                     ) {
@@ -116,7 +137,7 @@ fun ReviewDetailScreen(
                         },
                         colors = IconButtonDefaults.iconButtonColors(
                             containerColor = Color.White.copy(alpha = 0.6f),
-                            contentColor = MaterialTheme.colorScheme.primary
+                            contentColor = MaterialTheme.colorScheme.onSurfaceVariant
                         ),
                         shape = CircleShape,
                     ) {
@@ -161,38 +182,49 @@ fun NotFoundScreen() {
 fun SuccessScreen(
     uiState: ReviewDetailScreenState.Success,
 ) {
-    val sheetState = rememberStandardBottomSheetState(
-        initialValue = SheetValue.Expanded
-    )
     val scaffoldState = rememberBottomSheetScaffoldState(
-        bottomSheetState = sheetState
+        bottomSheetState = rememberStandardBottomSheetState(
+            initialValue = SheetValue.PartiallyExpanded
+        )
     )
-    BoxWithConstraints(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        val width = maxWidth
-        val height = maxHeight
 
+    BoxWithConstraints(Modifier.fillMaxSize()) {
         val thumbUri = remember { mutableStateOf(uiState.review.images.firstOrNull()?.uri) }
         val onClicked = { uri: Uri -> thumbUri.value = uri }
 
         BottomSheetScaffold(
             scaffoldState = scaffoldState,
-            sheetPeekHeight = height - width / MEDIA_COVER_ASPECT_RATIO - 50.dp,
+            sheetPeekHeight = maxHeight / 2,
             modifier = Modifier
                 .windowInsetsPadding(WindowInsets.navigationBars)
                 .fillMaxSize(),
             sheetContent = { ContentView(uiState = uiState, onClicked = onClicked) }
         ) { _ ->
-            AsyncImage(
-                model = thumbUri.value,
-                contentDescription = null,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .aspectRatio(MEDIA_COVER_ASPECT_RATIO)
-                    .align(Alignment.TopCenter),
-                contentScale = ContentScale.Crop
-            )
+            Box {
+                AsyncImage(
+                    model = thumbUri.value,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .aspectRatio(MEDIA_COVER_ASPECT_RATIO)
+                        .align(Alignment.TopCenter),
+                    contentScale = ContentScale.Crop
+                )
+                Box(
+                    Modifier
+                        .fillMaxWidth()
+                        .height(100.dp)
+                        .background(
+                            Brush.verticalGradient(
+                                colors = listOf(
+                                    Color.Black.copy(alpha = 0.65f),
+                                    Color.Black.copy(alpha = 0.25f),
+                                    Color.Transparent
+                                )
+                            )
+                        )
+                )
+            }
         }
     }
 }
@@ -209,26 +241,25 @@ fun ContentView(
     ) {
         if (uiState.review.images.size > 1) {
             Row(
-                modifier = Modifier.height(100.dp),
+                modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(
                     space = 6.dp,
                     alignment = Alignment.CenterHorizontally
                 )
-
             ) {
                 uiState.review.images.forEach { image ->
                     AsyncImage(
                         model = image.uri,
                         contentDescription = null,
                         modifier = Modifier
-                            .aspectRatio(1f)
+                            .size(100.dp)
                             .clip(RoundedCornerShape(8.dp))
-                            .clickable(enabled = true, onClick = {
-                                onClicked(image.uri)
-                            }),
+                            .clickable(
+                                enabled = true,
+                                onClick = { onClicked(image.uri) }
+                            ),
                         contentScale = ContentScale.Crop,
-
-                        )
+                    )
                 }
             }
             Spacer(Modifier.height(20.dp))
