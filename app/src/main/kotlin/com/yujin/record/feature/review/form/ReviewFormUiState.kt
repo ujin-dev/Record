@@ -6,7 +6,16 @@ import com.yujin.record.core.model.ReviewType
 import kotlin.time.Clock
 import kotlin.time.Instant
 
+enum class Overlay {
+    None,
+    Progress,
+    BottomSheet,
+}
+
 data class ReviewFormUiState(
+    val overlay: Overlay = Overlay.None,
+    val isLoading: Boolean = false,
+
     val id: Long = 0,
     val title: String = "",
     val content: String = "",
@@ -19,6 +28,7 @@ data class ReviewFormUiState(
     val selectedBookmarkId: Long = 0,
     val createdAt: Instant = Clock.System.now(),
     val updatedAt: Instant = Clock.System.now(),
+    val posterPaths: List<String> = emptyList()
 )
 
 fun ReviewFormUiState.toReview() = Review(

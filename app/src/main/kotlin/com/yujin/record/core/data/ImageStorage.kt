@@ -8,6 +8,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
+import java.io.IOException
+import java.net.HttpURLConnection
+import java.net.URL
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -25,10 +28,37 @@ class ImageStorage @Inject constructor(
         val fileName = "record_${System.currentTimeMillis()}.jpg"
         val targetFile = File(imageDir, fileName)
 
-        context.contentResolver.openInputStream(sourceUri).use { input ->
-            FileOutputStream(targetFile).use { output ->
-                input?.copyTo(output)
+        val inputStream = when (sourceUri.scheme?.lowercase()) {
+            "http", "https" -> {
+                val connection = URL(sourceUri.toString()).openConnection() as HttpURLConnection
+                connection.connectTimeout = 15_000
+                connection.readTimeout = 15_000
+                connection.requestMethod = "GET"
+                connection.connect()
+
+                if (connection.responseCode !in 200..299) {
+                    connection.disconnect()
+                    throw IOException("이미지 다운로드 실패: HTTP ${connection.responseCode}")
+                }
+
+                connection.inputStream
             }
+
+            else -> {
+                context.contentResolver.openInputStream(sourceUri)
+            }
+        }
+
+        try {
+            requireNotNull(inputStream) { "이미지 입력 스트림을 열 수 없습니다: $sourceUri" }
+                .use { input ->
+                    FileOutputStream(targetFile).use { output ->
+                        input.copyTo(output)
+                    }
+                }
+        } catch (e: Exception) {
+            targetFile.delete()
+            throw e
         }
 
         targetFile.toUri()

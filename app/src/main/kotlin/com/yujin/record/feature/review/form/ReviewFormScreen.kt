@@ -1,6 +1,7 @@
 package com.yujin.record.feature.review.form
 
 import android.net.Uri
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -44,6 +45,7 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material.icons.outlined.Book
 import androidx.compose.material.icons.outlined.Movie
+import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -235,6 +237,22 @@ fun ReviewFormScreen(
                     onValueChange = { onAction(ReviewFormUiAction.TitleChanged(it)) },
                     label = "제목",
                     placeholder = "작품명을 입력하세요",
+                    trailingIcon = {
+                        if (uiState.id == 0L && uiState.type == ReviewType.MOVIE) {
+                            IconButton(onClick = {
+                                keyboardController?.hide()
+                                focusManager.clearFocus()
+
+                                onAction(ReviewFormUiAction.SearchClicked)
+                            }) {
+                                Icon(
+                                    imageVector = Icons.Outlined.Search,
+                                    contentDescription = "search",
+                                    modifier = Modifier.size(24.dp)
+                                )
+                            }
+                        }
+                    },
                     imeAction = ImeAction.Next,
                 )
                 FormField(
@@ -432,6 +450,7 @@ private fun FormField(
     onValueChange: (String) -> Unit,
     label: String,
     placeholder: String,
+    trailingIcon: @Composable (() -> Unit)? = null,
     imeAction: ImeAction,
 ) {
     OutlinedTextField(
@@ -440,6 +459,7 @@ private fun FormField(
         modifier = Modifier.fillMaxWidth(),
         label = { Text(label) },
         placeholder = { Text(placeholder) },
+        trailingIcon = trailingIcon,
         singleLine = true,
         shape = RoundedCornerShape(Dimens.cornerSize),
         keyboardOptions = KeyboardOptions(

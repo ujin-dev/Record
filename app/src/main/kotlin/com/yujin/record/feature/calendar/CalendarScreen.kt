@@ -1,7 +1,6 @@
 package com.yujin.record.feature.calendar
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,17 +17,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.automirrored.filled.StarHalf
 import androidx.compose.material.icons.automirrored.outlined.MenuBook
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Movie
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material.icons.outlined.Movie
@@ -36,7 +30,6 @@ import androidx.compose.material.icons.outlined.PostAdd
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SheetValue
@@ -59,7 +52,6 @@ import com.yujin.record.core.model.ReviewType
 import com.yujin.record.core.ui.theme.Dimens
 import com.yujin.record.feature.calendar.component.CalendarPager
 import com.yujin.record.feature.calendar.component.WeekDayRow
-import com.yujin.record.feature.review.form.ReviewFormUiAction
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

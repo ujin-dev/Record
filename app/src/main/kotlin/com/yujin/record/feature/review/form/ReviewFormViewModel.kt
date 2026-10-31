@@ -1,11 +1,14 @@
 package com.yujin.record.feature.review.form
 
 import android.net.Uri
+import androidx.core.net.toUri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.yujin.record.app.navigation.RecordRoute
+import com.yujin.record.core.data.remote.model.MovieDto
+import com.yujin.record.core.data.repository.MovieRepository
 import com.yujin.record.core.data.repository.ReviewRepository
 import com.yujin.record.core.model.ImageItem
 import com.yujin.record.core.model.ReviewType
@@ -21,10 +24,13 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 import javax.inject.Inject
 
+private const val TMDB_IMAGE_BASE_URL = "https://image.tmdb.org/t/p/h632"
+
 @HiltViewModel
 class ReviewFormViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val reviewRepository: ReviewRepository,
+    private val movieRepository: MovieRepository,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(ReviewFormUiState())
     val uiState: StateFlow<ReviewFormUiState> = _uiState.asStateFlow()
@@ -73,10 +79,13 @@ class ReviewFormViewModel @Inject constructor(
             ReviewFormUiAction.SaveClicked -> saveReview()
             ReviewFormUiAction.BookmarkSelectorClicked -> openBookmarkSelector()
             ReviewFormUiAction.BackClicked -> backStack()
+            ReviewFormUiAction.SearchClicked -> search()
         }
     }
 
     private fun saveReview() {
+        _uiState.update { state -> state.copy(overlay = Overlay.Progress) }
+
         viewModelScope.launch {
             val review = _uiState.value.toReview()
             val result = if (review.id == 0L) {
@@ -90,17 +99,93 @@ class ReviewFormViewModel @Inject constructor(
                     _uiEvent.emit(ReviewFormUiEvent.NavigateToDetail(id))
                 }
                 .onFailure {
+                    _uiState.update { state -> state.copy(overlay = Overlay.None) }
                     _uiEvent.emit(ReviewFormUiEvent.ShowToast("저장에 실패했습니다."))
                 }
         }
     }
 
     private fun deleteReview() {
-        TODO()
+        // TODO
     }
 
     private fun openBookmarkSelector() {
-        TODO()
+        // TODO
+    }
+
+    private fun search() = viewModelScope.launch {
+        when (_uiState.value.type) {
+            ReviewType.MOVIE -> searchMovies()
+            ReviewType.BOOK -> searchBooks()
+        }
+    }
+
+    private suspend fun searchMovies() {
+        val title = _uiState.value.title
+
+        if (title.isEmpty()) {
+            // todo empty query
+
+        } else {
+            movieRepository.searchMovies(_uiState.value.title)
+                .onSuccess { result: List<MovieDto> ->
+                    when {
+                        result.isEmpty() -> {
+                            // todo snack bar empty result
+                        }
+
+                        result.size == 1 -> {
+                            getMovieDetail(result.first().id)
+                        }
+
+                        else -> {
+                            _uiState.update { state ->
+                                state.copy(
+                                    posterPaths = result.mapNotNull {
+                                        it.posterPath
+                                            ?.takeIf(String::isNotEmpty)
+                                            ?.let { path -> "$TMDB_IMAGE_BASE_URL$path" }
+                                    },
+                                    overlay = Overlay.BottomSheet
+                                )
+                            }
+                        }
+                    }
+                }.onFailure {
+                    // todo snack bar network error
+                }
+        }
+    }
+
+    private suspend fun getMovieDetail(movieId: Int) {
+        movieRepository.getMovieDetails(movieId)
+            .onSuccess { result ->
+                _uiState.update { state ->
+                    state.copy(
+                        title = result.title,
+                        creatorName = result.credits.crew
+                            .filter { it.job == "Director" }
+                            .joinToString(", ") { it.name },
+                        images = result.posterPath
+                            ?.let {
+                                listOf(
+                                    ImageItem(
+                                        uri = "$TMDB_IMAGE_BASE_URL${result.posterPath}".toUri()
+                                    )
+                                )
+                            }
+                            ?: emptyList(),
+                        tags = result.genres.map { it.name }
+                    )
+                }
+            }
+            .onFailure {
+                // todo network error
+            }
+    }
+
+    private fun searchBooks() {
+        // todo
     }
 
     private fun backStack() = viewModelScope.launch {
