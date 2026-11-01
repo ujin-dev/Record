@@ -75,11 +75,13 @@ class ReviewFormViewModel @Inject constructor(
             is ReviewFormUiAction.TagChanged -> onTagChanged(action.tag)
             is ReviewFormUiAction.TagAdded -> onTagAdded(action.tag)
             is ReviewFormUiAction.TagRemoved -> onTagRemoved(action.tag)
+            is ReviewFormUiAction.MovieClicked -> getMovieDetail(action.movieId)
 
             ReviewFormUiAction.SaveClicked -> saveReview()
             ReviewFormUiAction.BookmarkSelectorClicked -> openBookmarkSelector()
             ReviewFormUiAction.BackClicked -> backStack()
             ReviewFormUiAction.SearchClicked -> search()
+            ReviewFormUiAction.BottomSheetClosed -> closeBottomSheet()
         }
     }
 
@@ -105,6 +107,10 @@ class ReviewFormViewModel @Inject constructor(
         }
     }
 
+    private fun closeBottomSheet() {
+        _uiState.update { state -> state.copy(overlay = Overlay.None) }
+    }
+
     private fun deleteReview() {
         // TODO
     }
@@ -127,6 +133,8 @@ class ReviewFormViewModel @Inject constructor(
             // todo empty query
 
         } else {
+            _uiState.update { state -> state.copy(overlay = Overlay.Progress) }
+
             movieRepository.searchMovies(_uiState.value.title)
                 .onSuccess { result: List<MovieDto> ->
                     when {
@@ -141,12 +149,15 @@ class ReviewFormViewModel @Inject constructor(
                         else -> {
                             _uiState.update { state ->
                                 state.copy(
-                                    posterPaths = result.mapNotNull {
-                                        it.posterPath
-                                            ?.takeIf(String::isNotEmpty)
-                                            ?.let { path -> "$TMDB_IMAGE_BASE_URL$path" }
-                                    },
-                                    overlay = Overlay.BottomSheet
+                                    overlay = Overlay.BottomSheet,
+                                    posters = result.map {
+                                        MovieItem(
+                                            id = it.id,
+                                            title = it.title,
+                                            posterPath = it.posterPath
+                                                ?.takeIf(String::isNotEmpty)
+                                                ?.let { path -> "$TMDB_IMAGE_BASE_URL$path" })
+                                    }
                                 )
                             }
                         }
@@ -157,31 +168,36 @@ class ReviewFormViewModel @Inject constructor(
         }
     }
 
-    private suspend fun getMovieDetail(movieId: Int) {
-        movieRepository.getMovieDetails(movieId)
-            .onSuccess { result ->
-                _uiState.update { state ->
-                    state.copy(
-                        title = result.title,
-                        creatorName = result.credits.crew
-                            .filter { it.job == "Director" }
-                            .joinToString(", ") { it.name },
-                        images = result.posterPath
-                            ?.let {
-                                listOf(
-                                    ImageItem(
-                                        uri = "$TMDB_IMAGE_BASE_URL${result.posterPath}".toUri()
+    private fun getMovieDetail(movieId: Int) {
+        _uiState.update { state -> state.copy(overlay = Overlay.Progress) }
+
+        viewModelScope.launch {
+            movieRepository.getMovieDetails(movieId)
+                .onSuccess { result ->
+                    _uiState.update { state ->
+                        state.copy(
+                            overlay = Overlay.None,
+                            title = result.title,
+                            creatorName = result.credits.crew
+                                .filter { it.job == "Director" }
+                                .joinToString(", ") { it.name },
+                            images = result.posterPath
+                                ?.let {
+                                    listOf(
+                                        ImageItem(
+                                            uri = "$TMDB_IMAGE_BASE_URL${result.posterPath}".toUri()
+                                        )
                                     )
-                                )
-                            }
-                            ?: emptyList(),
-                        tags = result.genres.map { it.name }
-                    )
+                                }
+                                ?: emptyList(),
+                            tags = result.genres.map { it.name }
+                        )
+                    }
                 }
-            }
-            .onFailure {
-                // todo network error
-            }
+                .onFailure {
+                    // todo network error
+                }
+        }
     }
 
     private fun searchBooks() {

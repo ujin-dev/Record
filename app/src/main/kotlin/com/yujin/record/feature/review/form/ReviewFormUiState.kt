@@ -14,7 +14,6 @@ enum class Overlay {
 
 data class ReviewFormUiState(
     val overlay: Overlay = Overlay.None,
-    val isLoading: Boolean = false,
 
     val id: Long = 0,
     val title: String = "",
@@ -28,7 +27,13 @@ data class ReviewFormUiState(
     val selectedBookmarkId: Long = 0,
     val createdAt: Instant = Clock.System.now(),
     val updatedAt: Instant = Clock.System.now(),
-    val posterPaths: List<String> = emptyList()
+    val posters: List<MovieItem> = emptyList()
+)
+
+data class MovieItem(
+    val id: Int,
+    val title: String,
+    val posterPath: String? = ""
 )
 
 fun ReviewFormUiState.toReview() = Review(

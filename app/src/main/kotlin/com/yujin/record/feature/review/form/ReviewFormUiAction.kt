@@ -5,9 +5,11 @@ import com.yujin.record.core.model.ReviewType
 
 sealed interface ReviewFormUiAction {
     object BackClicked : ReviewFormUiAction
+    object BottomSheetClosed : ReviewFormUiAction
     data object SaveClicked : ReviewFormUiAction
     data object BookmarkSelectorClicked : ReviewFormUiAction
     data object SearchClicked : ReviewFormUiAction
+
 
     data class TitleChanged(val title: String) : ReviewFormUiAction
     data class TypeChanged(val type: ReviewType) : ReviewFormUiAction
@@ -19,4 +21,5 @@ sealed interface ReviewFormUiAction {
     data class TagRemoved(val tag: String) : ReviewFormUiAction
     data class ImageAdded(val images: List<Uri>) : ReviewFormUiAction
     data class ImageRemoved(val index: Int) : ReviewFormUiAction
+    data class MovieClicked(val movieId: Int) : ReviewFormUiAction
 }
