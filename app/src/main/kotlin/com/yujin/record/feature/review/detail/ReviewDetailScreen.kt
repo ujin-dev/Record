@@ -20,7 +20,6 @@ import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
@@ -30,9 +29,7 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
@@ -58,6 +55,7 @@ import androidx.core.view.WindowCompat
 import coil3.compose.AsyncImage
 import com.yujin.record.core.ui.MEDIA_COVER_ASPECT_RATIO
 import com.yujin.record.core.ui.toDisplayString
+import com.yujin.record.feature.review.detail.component.TopAppBarIconButton
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -100,52 +98,31 @@ fun ReviewDetailScreen(
                 scrolledContainerColor = Color.Transparent
             ),
             navigationIcon = {
-                FilledIconButton(
-                    onClick = { onAction(ReviewDetailUiAction.BackClicked) },
-                    colors = IconButtonDefaults.iconButtonColors(
-                        containerColor = Color.White.copy(alpha = 0.6f),
-                        contentColor = MaterialTheme.colorScheme.onSurfaceVariant
-                    ),
-                    shape = CircleShape,
-                ) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
-                        contentDescription = "뒤로가기"
-                    )
-                }
+                TopAppBarIconButton(
+                    imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
+                    contentDescription = "뒤로가기",
+                    onClick = {
+                        onAction(ReviewDetailUiAction.BackClicked)
+                    }
+                )
             },
             actions = {
                 if (uiState is ReviewDetailScreenState.Success) {
-                    FilledIconButton(
+                    TopAppBarIconButton(
+                        imageVector = Icons.Default.Edit,
+                        contentDescription = "수정하기",
                         onClick = {
                             onAction(ReviewDetailUiAction.EditClicked)
-                        },
-                        colors = IconButtonDefaults.iconButtonColors(
-                            containerColor = Color.White.copy(alpha = 0.6f),
-                            contentColor = MaterialTheme.colorScheme.onSurfaceVariant
-                        ),
-                        shape = CircleShape,
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Edit,
-                            contentDescription = "수정하기"
-                        )
-                    }
-                    FilledIconButton(
+                        }
+                    )
+
+                    TopAppBarIconButton(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = "삭제하기",
                         onClick = {
                             onAction(ReviewDetailUiAction.DeleteClicked)
-                        },
-                        colors = IconButtonDefaults.iconButtonColors(
-                            containerColor = Color.White.copy(alpha = 0.6f),
-                            contentColor = MaterialTheme.colorScheme.onSurfaceVariant
-                        ),
-                        shape = CircleShape,
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Delete,
-                            contentDescription = "삭제하기"
-                        )
-                    }
+                        }
+                    )
                 }
             },
         )
