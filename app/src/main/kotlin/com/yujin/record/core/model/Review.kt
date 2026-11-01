@@ -1,9 +1,7 @@
 package com.yujin.record.core.model
 
-import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
-@OptIn(ExperimentalTime::class)
 data class Review(
     val id: Long,
 

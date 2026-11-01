@@ -90,7 +90,7 @@ dependencies {
     implementation(libs.coil.network.okhttp)
 
     implementation(libs.retrofit)
-    implementation(libs.converter.gson)
+    implementation(libs.converter.kotlinx.serialization)
 
     testImplementation(libs.junit)
     androidTestImplementation(platform(libs.androidx.compose.bom))

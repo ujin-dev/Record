@@ -1,16 +1,17 @@
 package com.yujin.record.feature.review.form
 
 import android.net.Uri
+import android.util.Log
 import androidx.core.net.toUri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.yujin.record.app.navigation.RecordRoute
-import com.yujin.record.core.data.remote.model.MovieDto
-import com.yujin.record.core.data.repository.MovieRepository
+import com.yujin.record.core.data.repository.MediaRepository
 import com.yujin.record.core.data.repository.ReviewRepository
 import com.yujin.record.core.model.ImageItem
+import com.yujin.record.core.model.Media
 import com.yujin.record.core.model.ReviewType
 import com.yujin.record.feature.calendar.toInstant
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -30,7 +31,7 @@ private const val TMDB_IMAGE_BASE_URL = "https://image.tmdb.org/t/p/h632"
 class ReviewFormViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val reviewRepository: ReviewRepository,
-    private val movieRepository: MovieRepository,
+    private val mediaRepository: MediaRepository,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(ReviewFormUiState())
     val uiState: StateFlow<ReviewFormUiState> = _uiState.asStateFlow()
@@ -75,14 +76,23 @@ class ReviewFormViewModel @Inject constructor(
             is ReviewFormUiAction.TagChanged -> onTagChanged(action.tag)
             is ReviewFormUiAction.TagAdded -> onTagAdded(action.tag)
             is ReviewFormUiAction.TagRemoved -> onTagRemoved(action.tag)
-            is ReviewFormUiAction.MovieClicked -> getMovieDetail(action.movieId)
+            is ReviewFormUiAction.SearchResultItemClicked ->
+                when (action.type) {
+                    ReviewType.MOVIE -> getMovieDetail(action.mediaId)
+                    ReviewType.TV_SERIES -> getTvSeriesDetail(action.mediaId)
+                    else -> {}
+                }
 
             ReviewFormUiAction.SaveClicked -> saveReview()
-            ReviewFormUiAction.BookmarkSelectorClicked -> openBookmarkSelector()
             ReviewFormUiAction.BackClicked -> backStack()
             ReviewFormUiAction.SearchClicked -> search()
             ReviewFormUiAction.BottomSheetClosed -> closeBottomSheet()
+            ReviewFormUiAction.BookmarkSelectorClicked -> Unit // todo
         }
+    }
+
+    private fun closeBottomSheet() {
+        _uiState.update { state -> state.copy(overlay = Overlay.None) }
     }
 
     private fun saveReview() {
@@ -107,26 +117,14 @@ class ReviewFormViewModel @Inject constructor(
         }
     }
 
-    private fun closeBottomSheet() {
-        _uiState.update { state -> state.copy(overlay = Overlay.None) }
-    }
-
-    private fun deleteReview() {
-        // TODO
-    }
-
-    private fun openBookmarkSelector() {
-        // TODO
-    }
-
     private fun search() = viewModelScope.launch {
         when (_uiState.value.type) {
-            ReviewType.MOVIE -> searchMovies()
+            ReviewType.MOVIE, ReviewType.TV_SERIES -> searchMedia()
             ReviewType.BOOK -> searchBooks()
         }
     }
 
-    private suspend fun searchMovies() {
+    private suspend fun searchMedia() {
         val title = _uiState.value.title
 
         if (title.isEmpty()) {
@@ -135,49 +133,61 @@ class ReviewFormViewModel @Inject constructor(
         } else {
             _uiState.update { state -> state.copy(overlay = Overlay.Progress) }
 
-            movieRepository.searchMovies(_uiState.value.title)
-                .onSuccess { result: List<MovieDto> ->
+            mediaRepository.searchMedia(_uiState.value.title)
+                .onSuccess { result: List<Media> ->
+                    Log.d("search", result.size.toString())
+
                     when {
                         result.isEmpty() -> {
                             // todo snack bar empty result
                         }
 
                         result.size == 1 -> {
-                            getMovieDetail(result.first().id)
+                            _uiState.update { state -> state.copy(overlay = Overlay.Progress) }
+
+                            val media = result.first()
+                            when (media.mediaType) {
+                                ReviewType.MOVIE -> getMovieDetail(media.id)
+                                ReviewType.TV_SERIES -> getTvSeriesDetail(media.id)
+                                else -> Unit
+                            }
                         }
 
                         else -> {
                             _uiState.update { state ->
                                 state.copy(
                                     overlay = Overlay.BottomSheet,
-                                    posters = result.map {
-                                        MovieItem(
-                                            id = it.id,
-                                            title = it.title,
-                                            posterPath = it.posterPath
-                                                ?.takeIf(String::isNotEmpty)
-                                                ?.let { path -> "$TMDB_IMAGE_BASE_URL$path" })
+                                    posters = result.mapNotNull { item ->
+                                        item.mediaType?.let { reviewType ->
+                                            MediaItem(
+                                                id = item.id,
+                                                title = item.displayName,
+                                                type = reviewType,
+                                                posterPath = item.posterPath
+                                                    ?.takeIf(String::isNotEmpty)
+                                                    ?.let { path -> "$TMDB_IMAGE_BASE_URL$path" })
+                                        }
                                     }
                                 )
                             }
                         }
                     }
-                }.onFailure {
+                }.onFailure { e ->
                     // todo snack bar network error
+                    e.message?.let { msg -> Log.e("search", msg) }
                 }
         }
     }
 
     private fun getMovieDetail(movieId: Int) {
-        _uiState.update { state -> state.copy(overlay = Overlay.Progress) }
-
         viewModelScope.launch {
-            movieRepository.getMovieDetails(movieId)
+            mediaRepository.getDetailMovie(movieId)
                 .onSuccess { result ->
                     _uiState.update { state ->
                         state.copy(
                             overlay = Overlay.None,
                             title = result.title,
+                            type = ReviewType.MOVIE,
                             creatorName = result.credits.crew
                                 .filter { it.job == "Director" }
                                 .joinToString(", ") { it.name },
@@ -200,8 +210,38 @@ class ReviewFormViewModel @Inject constructor(
         }
     }
 
+    private fun getTvSeriesDetail(seriesId: Int) {
+        viewModelScope.launch {
+            mediaRepository.getDetailTvSeries(seriesId)
+                .onSuccess { result ->
+                    _uiState.update { state ->
+                        state.copy(
+                            overlay = Overlay.None,
+                            title = result.name,
+                            type = ReviewType.TV_SERIES,
+                            creatorName = result.createdBy.joinToString(", ") { it.name },
+                            images = result.posterPath
+                                ?.let {
+                                    listOf(
+                                        ImageItem(
+                                            uri = "$TMDB_IMAGE_BASE_URL${result.posterPath}".toUri()
+                                        )
+                                    )
+                                }
+                                ?: emptyList(),
+                            tags = result.genres.map { it.name }
+                        )
+                    }
+                }
+                .onFailure {
+                    // todo network error
+                }
+        }
+    }
+
+
     private fun searchBooks() {
-        // todo
+        // todo kakao api
     }
 
     private fun backStack() = viewModelScope.launch {

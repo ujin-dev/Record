@@ -25,6 +25,7 @@ import androidx.compose.material.icons.automirrored.filled.StarHalf
 import androidx.compose.material.icons.automirrored.outlined.MenuBook
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
+import androidx.compose.material.icons.outlined.LiveTv
 import androidx.compose.material.icons.outlined.Movie
 import androidx.compose.material.icons.outlined.PostAdd
 import androidx.compose.material3.BottomSheetScaffold
@@ -181,6 +182,7 @@ fun ListItemView(review: Review, onAction: (CalendarUiAction) -> Unit) {
             } ?: run {
                 val icon = when (review.reviewType) {
                     ReviewType.MOVIE -> Icons.Outlined.Movie
+                    ReviewType.TV_SERIES -> Icons.Outlined.LiveTv
                     ReviewType.BOOK -> Icons.AutoMirrored.Outlined.MenuBook
                 }
                 Icon(

@@ -27,11 +27,12 @@ data class ReviewFormUiState(
     val selectedBookmarkId: Long = 0,
     val createdAt: Instant = Clock.System.now(),
     val updatedAt: Instant = Clock.System.now(),
-    val posters: List<MovieItem> = emptyList()
+    val posters: List<MediaItem> = emptyList()
 )
 
-data class MovieItem(
+data class MediaItem(
     val id: Int,
+    val type: ReviewType,
     val title: String,
     val posterPath: String? = ""
 )

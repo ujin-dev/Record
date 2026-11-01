@@ -21,5 +21,5 @@ sealed interface ReviewFormUiAction {
     data class TagRemoved(val tag: String) : ReviewFormUiAction
     data class ImageAdded(val images: List<Uri>) : ReviewFormUiAction
     data class ImageRemoved(val index: Int) : ReviewFormUiAction
-    data class MovieClicked(val movieId: Int) : ReviewFormUiAction
+    data class SearchResultItemClicked(val type: ReviewType, val mediaId: Int) : ReviewFormUiAction
 }

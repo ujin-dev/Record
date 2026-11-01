@@ -44,10 +44,12 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AddPhotoAlternate
 import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.LiveTv
 import androidx.compose.material.icons.filled.Movie
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material.icons.outlined.Book
+import androidx.compose.material.icons.outlined.LiveTv
 import androidx.compose.material.icons.outlined.Movie
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.Button
@@ -224,7 +226,8 @@ fun ReviewFormScreen(
                                     Icon(
                                         imageVector = when (type) {
                                             ReviewType.MOVIE -> if (selected) Icons.Filled.Movie else Icons.Outlined.Movie
-                                            else -> if (selected) Icons.Filled.Book else Icons.Outlined.Book
+                                            ReviewType.TV_SERIES -> if (selected) Icons.Filled.LiveTv else Icons.Outlined.LiveTv
+                                            ReviewType.BOOK -> if (selected) Icons.Filled.Book else Icons.Outlined.Book
                                         },
                                         contentDescription = null,
                                         modifier = Modifier.size(18.dp),
@@ -423,8 +426,15 @@ fun ReviewFormScreen(
 
             if (uiState.overlay == Overlay.BottomSheet) {
                 SearchResultBottomSheet(
-                    movies = uiState.posters,
-                    onClick = { movieId -> onAction(ReviewFormUiAction.MovieClicked(movieId)) },
+                    medias = uiState.posters,
+                    onClick = { type, mediaId ->
+                        onAction(
+                            ReviewFormUiAction.SearchResultItemClicked(
+                                type,
+                                mediaId
+                            )
+                        )
+                    },
                     onDismiss = { onAction(ReviewFormUiAction.BottomSheetClosed) }
                 )
             }
@@ -528,8 +538,8 @@ fun SelectedImageItem(imageUri: Uri, onRemove: () -> Unit, modifier: Modifier = 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchResultBottomSheet(
-    movies: List<MovieItem>,
-    onClick: (Int) -> Unit,
+    medias: List<MediaItem>,
+    onClick: (ReviewType, Int) -> Unit,
     onDismiss: () -> Unit
 ) {
     val sheetState = rememberModalBottomSheetState()
@@ -561,12 +571,12 @@ fun SearchResultBottomSheet(
                     .padding(horizontal = BOTTOM_SHEET_PADDING.dp),
                 horizontalArrangement = Arrangement.spacedBy(4.dp),
             ) {
-                movies.forEach { movie ->
+                medias.forEach { media ->
                     SearchResultItemView(
-                        state = movie,
+                        state = media,
                     ) {
                         scope.launch { sheetState.hide() }
-                        onClick(movie.id)
+                        onClick(media.type, media.id)
                     }
                 }
             }
@@ -575,7 +585,7 @@ fun SearchResultBottomSheet(
 }
 
 @Composable
-fun SearchResultItemView(state: MovieItem, onClick: () -> Unit) {
+fun SearchResultItemView(state: MediaItem, onClick: () -> Unit) {
     Column(modifier = Modifier.width(100.dp)) {
         Box(
             modifier = Modifier
