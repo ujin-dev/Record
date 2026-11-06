@@ -11,10 +11,8 @@ sealed interface ReviewFormUiAction {
     data object SearchClicked : ReviewFormUiAction
     data object ShownSnackbarMessage : ReviewFormUiAction
 
-    data class TitleChanged(val title: String) : ReviewFormUiAction
+    data class FieldChanged(val field: ReviewFormField, val value: String) : ReviewFormUiAction
     data class TypeChanged(val type: ReviewType) : ReviewFormUiAction
-    data class CreatorNameChanged(val creatorName: String) : ReviewFormUiAction
-    data class ContentChanged(val content: String) : ReviewFormUiAction
     data class RatingChanged(val rating: Float) : ReviewFormUiAction
     data class TagChanged(val tag: String) : ReviewFormUiAction
     data class TagAdded(val tag: String) : ReviewFormUiAction
@@ -22,4 +20,10 @@ sealed interface ReviewFormUiAction {
     data class ImageAdded(val images: List<Uri>) : ReviewFormUiAction
     data class ImageRemoved(val index: Int) : ReviewFormUiAction
     data class SearchResultItemClicked(val type: ReviewType, val mediaId: Int) : ReviewFormUiAction
+}
+
+sealed interface ReviewFormField {
+    data object Title : ReviewFormField
+    data object Content : ReviewFormField
+    data object CreatorName : ReviewFormField
 }

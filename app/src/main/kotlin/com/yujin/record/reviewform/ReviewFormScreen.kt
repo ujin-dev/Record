@@ -191,7 +191,14 @@ fun ReviewFormScreen(
                 }
                 FormField(
                     value = uiState.title,
-                    onValueChange = { onAction(ReviewFormUiAction.TitleChanged(it)) },
+                    onValueChange = {
+                        onAction(
+                            ReviewFormUiAction.FieldChanged(
+                                ReviewFormField.Title,
+                                it
+                            )
+                        )
+                    },
                     label = "제목",
                     placeholder = "작품명을 입력하세요",
                     trailingIcon = {
@@ -214,7 +221,14 @@ fun ReviewFormScreen(
                 )
                 FormField(
                     value = uiState.creatorName,
-                    onValueChange = { onAction(ReviewFormUiAction.CreatorNameChanged(it)) },
+                    onValueChange = {
+                        onAction(
+                            ReviewFormUiAction.FieldChanged(
+                                ReviewFormField.CreatorName,
+                                it
+                            )
+                        )
+                    },
                     label = if (uiState.type == ReviewType.MOVIE) "제작자" else "저자",
                     placeholder = "이름을 입력하세요",
                     imeAction = ImeAction.Next,
@@ -272,7 +286,14 @@ fun ReviewFormScreen(
                 }
                 OutlinedTextField(
                     value = uiState.content,
-                    onValueChange = { onAction(ReviewFormUiAction.ContentChanged(it)) },
+                    onValueChange = {
+                        onAction(
+                            ReviewFormUiAction.FieldChanged(
+                                ReviewFormField.Content,
+                                it
+                            )
+                        )
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .heightIn(min = 48.dp)

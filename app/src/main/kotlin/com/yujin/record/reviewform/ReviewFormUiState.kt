@@ -1,16 +1,11 @@
 package com.yujin.record.reviewform
 
 import com.yujin.record.model.ImageItem
+import com.yujin.record.model.MediaItem
 import com.yujin.record.model.Review
 import com.yujin.record.model.ReviewType
 import kotlin.time.Clock
 import kotlin.time.Instant
-
-enum class Overlay {
-    None,
-    Progress,
-    BottomSheet,
-}
 
 data class ReviewFormUiState(
     val overlay: Overlay = Overlay.None,
@@ -31,12 +26,11 @@ data class ReviewFormUiState(
     val posters: List<MediaItem> = emptyList()
 )
 
-data class MediaItem(
-    val id: Int,
-    val type: ReviewType,
-    val title: String,
-    val posterPath: String? = ""
-)
+enum class Overlay {
+    None,
+    Progress,
+    BottomSheet,
+}
 
 fun ReviewFormUiState.toReview() = Review(
     id = id,

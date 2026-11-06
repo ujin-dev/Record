@@ -25,7 +25,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
-import com.yujin.record.reviewform.MediaItem
+import com.yujin.record.model.MediaItem
 import com.yujin.record.ui.MEDIA_COVER_ASPECT_RATIO
 
 @Composable

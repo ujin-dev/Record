@@ -20,7 +20,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.yujin.record.model.ReviewType
-import com.yujin.record.reviewform.MediaItem
+import com.yujin.record.model.MediaItem
 import com.yujin.record.ui.BOTTOM_SHEET_PADDING
 import kotlinx.coroutines.launch
 

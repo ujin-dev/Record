@@ -12,6 +12,7 @@ import com.yujin.record.calendar.toInstant
 import com.yujin.record.data.repository.MediaRepository
 import com.yujin.record.data.repository.ReviewRepository
 import com.yujin.record.model.ImageItem
+import com.yujin.record.model.MediaItem
 import com.yujin.record.model.ReviewType
 import com.yujin.record.model.TmdbMedia
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -68,10 +69,8 @@ class ReviewFormViewModel @Inject constructor(
 
     fun onAction(action: ReviewFormUiAction) {
         when (action) {
-            is ReviewFormUiAction.TitleChanged -> onTitleChanged(action.title)
+            is ReviewFormUiAction.FieldChanged -> onFieldChanged(action.field, action.value)
             is ReviewFormUiAction.TypeChanged -> onReviewTypeChanged(action.type)
-            is ReviewFormUiAction.CreatorNameChanged -> onCreatorNameChanged(action.creatorName)
-            is ReviewFormUiAction.ContentChanged -> onContentChanged(action.content)
             is ReviewFormUiAction.RatingChanged -> onRatingChanged(action.rating)
             is ReviewFormUiAction.ImageAdded -> onImageAdded(action.images)
             is ReviewFormUiAction.ImageRemoved -> onImageRemoved(action.index)
@@ -267,27 +266,20 @@ class ReviewFormViewModel @Inject constructor(
         }
     }
 
-    private fun onTitleChanged(title: String) {
+    private fun onFieldChanged(field: ReviewFormField, value: String) {
+        val startTrimValue = value.trimStart()
         _uiState.update {
-            it.copy(title = title.trimStart())
-        }
-    }
-
-    private fun onContentChanged(content: String) {
-        _uiState.update {
-            it.copy(content = content.trimStart())
+            when (field) {
+                ReviewFormField.Title -> it.copy(title = startTrimValue)
+                ReviewFormField.CreatorName -> it.copy(creatorName = startTrimValue)
+                ReviewFormField.Content -> it.copy(content = startTrimValue)
+            }
         }
     }
 
     private fun onTagChanged(tag: String) {
         _uiState.update {
             it.copy(tagInput = tag.trimStart())
-        }
-    }
-
-    private fun onCreatorNameChanged(creatorName: String) {
-        _uiState.update {
-            it.copy(creatorName = creatorName.trimStart())
         }
     }
 
