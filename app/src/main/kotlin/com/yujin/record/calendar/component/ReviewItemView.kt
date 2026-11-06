@@ -51,7 +51,7 @@ fun ReviewItemView(review: Review, onClick: () -> Unit) {
         ) {
             review.images.firstOrNull()?.let { image ->
                 AsyncImage(
-                    model = review.images.getOrNull(0)?.uri,
+                    model = image.uri,
                     contentDescription = "thumbnail",
                     contentScale = ContentScale.Crop,
                 )
