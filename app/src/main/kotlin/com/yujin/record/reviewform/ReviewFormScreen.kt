@@ -1,45 +1,30 @@
 package com.yujin.record.reviewform
 
-import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.navigationBars
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.StarHalf
-import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AddPhotoAlternate
 import androidx.compose.material.icons.filled.Book
@@ -52,10 +37,6 @@ import androidx.compose.material.icons.outlined.Book
 import androidx.compose.material.icons.outlined.LiveTv
 import androidx.compose.material.icons.outlined.Movie
 import androidx.compose.material.icons.outlined.Search
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
@@ -63,16 +44,12 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.InputChip
 import androidx.compose.material3.LocalMinimumInteractiveComponentSize
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -80,35 +57,29 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import coil3.compose.AsyncImage
 import com.yujin.record.model.ReviewType
-import com.yujin.record.ui.BOTTOM_SHEET_PADDING
-import com.yujin.record.ui.MEDIA_COVER_ASPECT_RATIO
+import com.yujin.record.reviewform.component.FormField
+import com.yujin.record.reviewform.component.FormSection
+import com.yujin.record.reviewform.component.ReviewFormBottomBar
+import com.yujin.record.reviewform.component.ReviewFormTopAppBar
+import com.yujin.record.reviewform.component.SearchResultBottomSheet
+import com.yujin.record.reviewform.component.SelectedImageItem
 import com.yujin.record.ui.theme.Dimens
 import com.yujin.record.ui.toDisplayString
-import kotlinx.coroutines.launch
 
 private const val MAX_IMAGE_COUNT = 3
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReviewFormScreen(
     uiState: ReviewFormUiState,
@@ -149,49 +120,17 @@ fun ReviewFormScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Column {
-                        Text(
-                            text = if (uiState.id == 0L) "리뷰 작성" else "리뷰 수정",
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.SemiBold,
-                        )
-                        Text(
-                            text = uiState.createdAt.toDisplayString(),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                },
-                navigationIcon = {
-                    IconButton(onClick = { onAction(ReviewFormUiAction.BackClicked) }) {
-                        Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = "뒤로가기")
-                    }
-                },
+            ReviewFormTopAppBar(
+                title = if (uiState.id == 0L) "리뷰 작성" else "리뷰 수정",
+                description = uiState.createdAt.toDisplayString(),
+                backClick = { onAction(ReviewFormUiAction.BackClicked) }
             )
         },
         bottomBar = {
-            Surface(
-                shadowElevation = 3.dp,
-                color = MaterialTheme.colorScheme.surface
-            ) {
-                Button(
-                    onClick = { onAction(ReviewFormUiAction.SaveClicked) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .windowInsetsPadding(WindowInsets.navigationBars)
-                        .padding(Dimens.screenPadding)
-                        .imePadding()
-                        .height(56.dp),
-                    shape = RoundedCornerShape(16.dp),
-                ) {
-                    Text(
-                        if (uiState.id == 0L) "리뷰 저장" else "수정 완료",
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                }
-            }
+            ReviewFormBottomBar(
+                text = if (uiState.id == 0L) "리뷰 저장" else "수정 완료",
+                onClick = { onAction(ReviewFormUiAction.SaveClicked) }
+            )
         },
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
     ) { innerPadding ->
@@ -450,194 +389,5 @@ fun ReviewFormScreen(
                 }
             }
         }
-    }
-}
-
-@Composable
-private fun FormSection(
-    title: String,
-    description: String,
-    content: @Composable () -> Unit,
-) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(Dimens.cardCornerSize),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
-    ) {
-        Column(
-            modifier = Modifier.padding(Dimens.screenPadding),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Column(verticalArrangement = Arrangement.spacedBy(3.dp)) {
-                Text(
-                    title,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold
-                )
-                Text(
-                    description, style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-            content()
-        }
-    }
-}
-
-@Composable
-private fun FormField(
-    value: String,
-    onValueChange: (String) -> Unit,
-    label: String,
-    placeholder: String,
-    trailingIcon: @Composable (() -> Unit)? = null,
-    imeAction: ImeAction,
-) {
-    OutlinedTextField(
-        value = value,
-        onValueChange = onValueChange,
-        modifier = Modifier.fillMaxWidth(),
-        label = { Text(label) },
-        placeholder = { Text(placeholder) },
-        trailingIcon = trailingIcon,
-        singleLine = true,
-        shape = RoundedCornerShape(Dimens.cornerSize),
-        keyboardOptions = KeyboardOptions(
-            keyboardType = KeyboardType.Text,
-            capitalization = KeyboardCapitalization.Sentences,
-            imeAction = imeAction,
-        ),
-    )
-}
-
-@Composable
-fun SelectedImageItem(imageUri: Uri, onRemove: () -> Unit, modifier: Modifier = Modifier) {
-    Box(modifier = modifier) {
-        AsyncImage(
-            model = imageUri,
-            contentDescription = null,
-            modifier = Modifier
-                .fillMaxWidth()
-                .aspectRatio(1f)
-                .clip(RoundedCornerShape(Dimens.cornerSize)),
-            contentScale = ContentScale.Crop,
-        )
-
-        CompositionLocalProvider(LocalMinimumInteractiveComponentSize provides 0.dp) {
-            IconButton(
-                onClick = onRemove,
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(6.dp)
-                    .size(32.dp)
-                    .background(
-                        Color.Black.copy(alpha = 0.6f),
-                        CircleShape
-                    )
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Close,
-                    contentDescription = "remove icon",
-                    tint = Color.White,
-                    modifier = Modifier.size(20.dp)
-                )
-            }
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun SearchResultBottomSheet(
-    medias: List<MediaItem>,
-    onClick: (ReviewType, Int) -> Unit,
-    onDismiss: () -> Unit
-) {
-    val sheetState = rememberModalBottomSheetState()
-    val scope = rememberCoroutineScope()
-
-    ModalBottomSheet(
-        sheetState = sheetState,
-        onDismissRequest = onDismiss
-    ) {
-
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .navigationBarsPadding()
-                .padding(bottom = BOTTOM_SHEET_PADDING.dp)
-        ) {
-            Text(
-                text = "영화를 선택해 주세요.",
-                style = MaterialTheme.typography.headlineSmall,
-                modifier = Modifier.padding(start = BOTTOM_SHEET_PADDING.dp)
-            )
-
-            Spacer(Modifier.height(16.dp))
-
-            Row(
-                modifier = Modifier
-                    .horizontalScroll(rememberScrollState())
-                    .fillMaxWidth()
-                    .padding(horizontal = BOTTOM_SHEET_PADDING.dp),
-                horizontalArrangement = Arrangement.spacedBy(4.dp),
-            ) {
-                medias.forEach { media ->
-                    SearchResultItemView(
-                        state = media,
-                    ) {
-                        scope.launch { sheetState.hide() }
-                        onClick(media.type, media.id)
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun SearchResultItemView(state: MediaItem, onClick: () -> Unit) {
-    Column(modifier = Modifier.width(100.dp)) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .aspectRatio(MEDIA_COVER_ASPECT_RATIO)
-                .clip(shape = RoundedCornerShape(8.dp))
-                .border(
-                    width = 1.dp,
-                    color = MaterialTheme.colorScheme.outline,
-                    shape = RoundedCornerShape(8.dp),
-                )
-                .clickable(onClick = onClick),
-            contentAlignment = Alignment.Center
-        ) {
-            state.posterPath?.let {
-                AsyncImage(
-                    model = state.posterPath,
-                    contentDescription = state.title,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .aspectRatio(MEDIA_COVER_ASPECT_RATIO)
-                        .clip(shape = RoundedCornerShape(8.dp))
-                )
-            } ?: run {
-                Icon(
-                    imageVector = Icons.Outlined.Movie,
-                    contentDescription = null,
-                    modifier = Modifier.size(24.dp),
-                )
-            }
-        }
-        Spacer(Modifier.height(4.dp))
-        Text(
-            text = state.title,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 2.dp),
-            textAlign = TextAlign.Center,
-            maxLines = 3,
-            style = MaterialTheme.typography.bodyMedium,
-        )
     }
 }
