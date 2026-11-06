@@ -8,12 +8,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.yujin.record.RecordRoute
+import com.yujin.record.calendar.toInstant
 import com.yujin.record.data.repository.MediaRepository
 import com.yujin.record.data.repository.ReviewRepository
 import com.yujin.record.model.ImageItem
-import com.yujin.record.model.Media
 import com.yujin.record.model.ReviewType
-import com.yujin.record.calendar.toInstant
+import com.yujin.record.model.TmdbMedia
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -48,8 +48,8 @@ class ReviewFormViewModel @Inject constructor(
             route.reviewId != null -> loadReview(route.reviewId)
             route.createdDate != null -> {
                 val date = LocalDate.parse(route.createdDate).toInstant()
-                _uiState.update { currentState ->
-                    currentState.copy(createdAt = date, updatedAt = date)
+                _uiState.update {
+                    it.copy(createdAt = date, updatedAt = date)
                 }
             }
         }
@@ -60,7 +60,9 @@ class ReviewFormViewModel @Inject constructor(
             .onSuccess { review ->
                 _uiState.update { review.toUiState() }
             }.onFailure {
-                _uiEvent.emit(ReviewFormUiEvent.ShowToast("리뷰를 불러오는데 실패했습니다."))
+                _uiState.update {
+                    it.copy(userMessage = "리뷰를 불러오는데 실패했습니다.")
+                }
             }
     }
 
@@ -88,15 +90,16 @@ class ReviewFormViewModel @Inject constructor(
             ReviewFormUiAction.SearchClicked -> search()
             ReviewFormUiAction.BottomSheetClosed -> closeBottomSheet()
             ReviewFormUiAction.BookmarkSelectorClicked -> Unit // todo
+            ReviewFormUiAction.ShownSnackbarMessage -> removeSnackbarMessage()
         }
     }
 
     private fun closeBottomSheet() {
-        _uiState.update { state -> state.copy(overlay = Overlay.None) }
+        _uiState.update { it.copy(overlay = Overlay.None) }
     }
 
     private fun saveReview() {
-        _uiState.update { state -> state.copy(overlay = Overlay.Progress) }
+        _uiState.update { it.copy(overlay = Overlay.Progress) }
 
         viewModelScope.launch {
             val review = _uiState.value.toReview()
@@ -111,8 +114,12 @@ class ReviewFormViewModel @Inject constructor(
                     _uiEvent.emit(ReviewFormUiEvent.NavigateToDetail(id))
                 }
                 .onFailure {
-                    _uiState.update { state -> state.copy(overlay = Overlay.None) }
-                    _uiEvent.emit(ReviewFormUiEvent.ShowToast("저장에 실패했습니다."))
+                    _uiState.update {
+                        it.copy(
+                            overlay = Overlay.None,
+                            userMessage = "저장에 실패했습니다."
+                        )
+                    }
                 }
         }
     }
@@ -131,10 +138,10 @@ class ReviewFormViewModel @Inject constructor(
             // todo empty query
 
         } else {
-            _uiState.update { state -> state.copy(overlay = Overlay.Progress) }
+            _uiState.update { it.copy(overlay = Overlay.Progress) }
 
             mediaRepository.searchMedia(_uiState.value.title)
-                .onSuccess { result: List<Media> ->
+                .onSuccess { result: List<TmdbMedia> ->
                     Log.d("search", result.size.toString())
 
                     when {
@@ -143,7 +150,7 @@ class ReviewFormViewModel @Inject constructor(
                         }
 
                         result.size == 1 -> {
-                            _uiState.update { state -> state.copy(overlay = Overlay.Progress) }
+                            _uiState.update { it.copy(overlay = Overlay.Progress) }
 
                             val media = result.first()
                             when (media.mediaType) {
@@ -154,8 +161,8 @@ class ReviewFormViewModel @Inject constructor(
                         }
 
                         else -> {
-                            _uiState.update { state ->
-                                state.copy(
+                            _uiState.update {
+                                it.copy(
                                     overlay = Overlay.BottomSheet,
                                     posters = result.mapNotNull { item ->
                                         item.mediaType?.let { reviewType ->
@@ -183,8 +190,8 @@ class ReviewFormViewModel @Inject constructor(
         viewModelScope.launch {
             mediaRepository.getDetailMovie(movieId)
                 .onSuccess { result ->
-                    _uiState.update { state ->
-                        state.copy(
+                    _uiState.update {
+                        it.copy(
                             overlay = Overlay.None,
                             title = result.title,
                             type = ReviewType.MOVIE,
@@ -214,8 +221,8 @@ class ReviewFormViewModel @Inject constructor(
         viewModelScope.launch {
             mediaRepository.getDetailTvSeries(seriesId)
                 .onSuccess { result ->
-                    _uiState.update { state ->
-                        state.copy(
+                    _uiState.update {
+                        it.copy(
                             overlay = Overlay.None,
                             title = result.name,
                             type = ReviewType.TV_SERIES,
@@ -244,41 +251,49 @@ class ReviewFormViewModel @Inject constructor(
         // todo kakao api
     }
 
+    private fun removeSnackbarMessage() {
+        _uiState.update {
+            it.copy(userMessage = null)
+        }
+    }
+
     private fun backStack() = viewModelScope.launch {
         _uiEvent.emit(ReviewFormUiEvent.NavigateToBack)
     }
 
     private fun onReviewTypeChanged(type: ReviewType) {
-        _uiState.update { state ->
-            state.copy(type = type)
+        _uiState.update {
+            it.copy(type = type)
         }
     }
 
     private fun onTitleChanged(title: String) {
-        _uiState.update { state ->
-            state.copy(title = title.trimStart())
+        _uiState.update {
+            it.copy(title = title.trimStart())
         }
     }
 
     private fun onContentChanged(content: String) {
-        _uiState.update { state ->
-            state.copy(content = content.trimStart())
+        _uiState.update {
+            it.copy(content = content.trimStart())
         }
     }
 
     private fun onTagChanged(tag: String) {
-        _uiState.update { state -> state.copy(tagInput = tag.trimStart()) }
+        _uiState.update {
+            it.copy(tagInput = tag.trimStart())
+        }
     }
 
     private fun onCreatorNameChanged(creatorName: String) {
-        _uiState.update { state ->
-            state.copy(creatorName = creatorName.trimStart())
+        _uiState.update {
+            it.copy(creatorName = creatorName.trimStart())
         }
     }
 
     private fun onRatingChanged(rating: Float) {
-        _uiState.update { state ->
-            state.copy(rating = rating)
+        _uiState.update {
+            it.copy(rating = rating)
         }
     }
 
@@ -290,9 +305,9 @@ class ReviewFormViewModel @Inject constructor(
             .distinct()
 
         if (newTags.isNotEmpty()) {
-            _uiState.update { state ->
-                state.copy(
-                    tags = state.tags + newTags,
+            _uiState.update {
+                it.copy(
+                    tags = it.tags + newTags,
                     tagInput = "",
                 )
             }
@@ -300,20 +315,20 @@ class ReviewFormViewModel @Inject constructor(
     }
 
     private fun onTagRemoved(tag: String) {
-        _uiState.update { state ->
-            state.copy(tags = state.tags - tag)
+        _uiState.update {
+            it.copy(tags = it.tags - tag)
         }
     }
 
     private fun onImageAdded(images: List<Uri>) {
-        _uiState.update { state ->
-            state.copy(images = state.images + images.map { ImageItem(uri = it) })
+        _uiState.update {
+            it.copy(images = it.images + images.map { uri -> ImageItem(uri = uri) })
         }
     }
 
     private fun onImageRemoved(index: Int) {
-        _uiState.update { state ->
-            state.copy(images = state.images.toMutableList().apply {
+        _uiState.update {
+            it.copy(images = it.images.toMutableList().apply {
                 removeAt(index)
             })
         }

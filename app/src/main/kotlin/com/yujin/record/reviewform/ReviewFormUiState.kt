@@ -14,6 +14,7 @@ enum class Overlay {
 
 data class ReviewFormUiState(
     val overlay: Overlay = Overlay.None,
+    val userMessage: String? = null,
 
     val id: Long = 0,
     val title: String = "",

@@ -1,6 +1,6 @@
 package com.yujin.record.model
 
-data class Media(
+data class TmdbMedia(
     val id: Int,
     val displayName: String,
     val posterPath: String?,
