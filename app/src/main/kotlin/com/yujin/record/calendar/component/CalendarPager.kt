@@ -46,8 +46,6 @@ fun CalendarPager(
         pageCount = { RANGE },
     )
 
-//    val weekCount = remember { mutableIntStateOf(getWeekCount(state.displayedYearMonth)) }
-
     LaunchedEffect(state.displayedYearMonth) {
         val targetPage = BASE_PAGE + betweenMonth(anchorYearMonth, state.displayedYearMonth)
         if (pagerState.currentPage != targetPage) {
@@ -65,14 +63,6 @@ fun CalendarPager(
                 }
             }
     }
-
-//    LaunchedEffect(pagerState) {
-//        snapshotFlow { pagerState.settledPage }
-//            .collect { page ->
-//                val targetMonth = anchorYearMonth.plus(page - BASE_PAGE, DateTimeUnit.MONTH)
-//                weekCount.intValue = getWeekCount(targetMonth)
-//            }
-//    }
 
     HorizontalPager(
         state = pagerState,
