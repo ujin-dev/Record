@@ -98,28 +98,32 @@ class ReviewFormViewModel @Inject constructor(
     }
 
     private fun saveReview() {
-        _uiState.update { it.copy(overlay = Overlay.Progress) }
+        if (_uiState.value.title.isEmpty()) {
+            _uiState.update { it.copy(userMessage = "제목을 입력해 주세요.") }
+        } else {
+            _uiState.update { it.copy(overlay = Overlay.Progress) }
 
-        viewModelScope.launch {
-            val review = _uiState.value.toReview()
-            val result = if (review.id == 0L) {
-                reviewRepository.insertReview(review)
-            } else {
-                reviewRepository.updateReview(review).map { review.id }
-            }
-
-            result
-                .onSuccess { id ->
-                    _uiEvent.emit(ReviewFormUiEvent.NavigateToDetail(id))
+            viewModelScope.launch {
+                val review = _uiState.value.toReview()
+                val result = if (review.id == 0L) {
+                    reviewRepository.insertReview(review)
+                } else {
+                    reviewRepository.updateReview(review).map { review.id }
                 }
-                .onFailure {
-                    _uiState.update {
-                        it.copy(
-                            overlay = Overlay.None,
-                            userMessage = "저장에 실패했습니다."
-                        )
+
+                result
+                    .onSuccess { id ->
+                        _uiEvent.emit(ReviewFormUiEvent.NavigateToDetail(id))
                     }
-                }
+                    .onFailure {
+                        _uiState.update {
+                            it.copy(
+                                overlay = Overlay.None,
+                                userMessage = "저장에 실패했습니다."
+                            )
+                        }
+                    }
+            }
         }
     }
 
