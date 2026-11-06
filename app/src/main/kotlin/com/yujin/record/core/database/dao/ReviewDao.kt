@@ -32,6 +32,6 @@ interface ReviewDao {
     suspend fun getById(reviewId: Long): ReviewWithImages?
 
     @Transaction
-    @Query("SELECT * FROM reviews WHERE created_at BETWEEN :start AND :end")
+    @Query("SELECT * FROM reviews WHERE created_at >= :start AND created_at < :end")
     fun observeByDateRange(start: Instant, end: Instant): Flow<List<ReviewWithImages>>
 }
