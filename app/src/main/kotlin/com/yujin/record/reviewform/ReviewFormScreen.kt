@@ -3,7 +3,6 @@ package com.yujin.record.reviewform
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -24,15 +23,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.StarHalf
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AddPhotoAlternate
 import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.LiveTv
 import androidx.compose.material.icons.filled.Movie
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material.icons.outlined.Book
 import androidx.compose.material.icons.outlined.LiveTv
 import androidx.compose.material.icons.outlined.Movie
@@ -54,14 +50,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -71,6 +65,7 @@ import androidx.compose.ui.unit.dp
 import com.yujin.record.model.ReviewType
 import com.yujin.record.reviewform.component.FormField
 import com.yujin.record.reviewform.component.FormSection
+import com.yujin.record.reviewform.component.RatingBar
 import com.yujin.record.reviewform.component.ReviewFormBottomBar
 import com.yujin.record.reviewform.component.ReviewFormTopAppBar
 import com.yujin.record.reviewform.component.SearchResultBottomSheet
@@ -236,50 +231,18 @@ fun ReviewFormScreen(
             }
 
             FormSection(title = "감상", description = "별점과 기억하고 싶은 장면을 남겨보세요") {
-                var rate by remember(uiState.rating) { mutableFloatStateOf(uiState.rating) }
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Row(
-                        modifier = Modifier
-                            .pointerInput(Unit) {
-                                detectTapGestures { point ->
-                                    val starWidth = size.width / 5f
-                                    val index = (point.x / starWidth).toInt().coerceIn(0, 4)
-                                    val fraction = (point.x - index * starWidth) / starWidth
-                                    rate = index + if (fraction < 0.5f) 0.5f else 1f
-                                    onAction(ReviewFormUiAction.RatingChanged(rate))
-                                }
-                            }
-                            .pointerInput(Unit) {
-                                detectHorizontalDragGestures { change: PointerInputChange, _ ->
-                                    val starWidth = size.width / 5f
-                                    val index =
-                                        (change.position.x / starWidth).toInt().coerceIn(0, 4)
-                                    val fraction =
-                                        (change.position.x - index * starWidth) / starWidth
-                                    rate = index + if (fraction < 0.5f) 0.5f else 1f
-                                    onAction(ReviewFormUiAction.RatingChanged(rate))
-                                    change.consume()
-                                }
-                            },
-                    ) {
-                        repeat(5) { index ->
-                            Icon(
-                                imageVector = when {
-                                    index + 1 <= rate -> Icons.Filled.Star
-                                    index < rate -> Icons.AutoMirrored.Filled.StarHalf
-                                    else -> Icons.Filled.StarBorder
-                                },
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.size(32.dp),
-                            )
-                        }
-                    }
+                    RatingBar(
+                        rating = uiState.rating,
+                        onRatingChange = {
+                            onAction(ReviewFormUiAction.RatingChanged(it))
+                        },
+                    )
                     Text(
-                        "%.1f".format(rate),
+                        "%.1f".format(uiState.rating),
                         style = MaterialTheme.typography.titleLarge,
                         color = MaterialTheme.colorScheme.primary
                     )
