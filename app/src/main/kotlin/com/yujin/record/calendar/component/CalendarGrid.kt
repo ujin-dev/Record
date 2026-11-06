@@ -26,26 +26,30 @@ import kotlinx.datetime.minus
 import kotlinx.datetime.plus
 import kotlin.math.ceil
 
+private data class CalendarMonthData(
+    val weeks: List<List<LocalDate?>>
+)
+
 @Composable
 fun CalendarGrid(
     month: YearMonth,
     state: Map<LocalDate, CalendarCellUiState>? = null,
-    selectedDate : LocalDate,
+    selectedDate: LocalDate,
     onAction: (CalendarUiAction) -> Unit,
 ) {
-    val firstDay = month.firstDay()
-    val startOffset = firstDay.dayOfWeek.isoDayNumber % 7
-    val weekCount = ceil((startOffset + month.numberOfDays) / 7f).toInt()
-    val totalCellCount = weekCount * 7
-    val startDate = firstDay - DatePeriod(days = startOffset)
+    val monthDate = remember(month) {
+        val firstDay = month.firstDay()
+        val startOffset = firstDay.dayOfWeek.isoDayNumber % 7
+        val weekCount = ceil((startOffset + month.numberOfDays) / 7f).toInt()
+        val totalCellCount = weekCount * 7
+        val startDate = firstDay - DatePeriod(days = startOffset)
 
-    val dates: List<LocalDate?> = (0 until totalCellCount).map { index ->
-        val date = startDate + DatePeriod(days = index)
-        if (date.toYearMonth() == month) date else null
-    }
+        val dates: List<LocalDate?> = (0 until totalCellCount).map { index ->
+            val date = startDate + DatePeriod(days = index)
+            if (date.toYearMonth() == month) date else null
+        }
 
-    val weeks = remember(dates) {
-        dates.chunked(7)
+        CalendarMonthData(dates.chunked(7))
     }
 
     Column(
@@ -54,7 +58,7 @@ fun CalendarGrid(
             .wrapContentHeight(Alignment.Top),
         verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
-        weeks.forEach { week ->
+        monthDate.weeks.forEach { week ->
             Row(
                 modifier = Modifier.padding(horizontal = 8.dp),
                 horizontalArrangement = Arrangement.spacedBy(4.dp)
