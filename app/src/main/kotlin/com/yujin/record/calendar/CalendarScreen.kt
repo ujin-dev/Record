@@ -94,7 +94,10 @@ fun CalendarScreen(
                     }
                 } else {
                     LazyColumn(Modifier.fillMaxHeight()) {
-                        items(uiState.monthlyReviews) { review ->
+                        items(
+                            items = uiState.monthlyReviews,
+                            key = { review -> review.id }
+                        ) { review ->
                             ReviewItemView(
                                 review = review,
                                 onClick = { onAction(CalendarUiAction.ReviewClicked(review.id)) })
