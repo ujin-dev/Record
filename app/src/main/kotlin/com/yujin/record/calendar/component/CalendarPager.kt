@@ -11,33 +11,28 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import com.yujin.record.calendar.CalendarContentUiState
 import com.yujin.record.calendar.CalendarUiAction
-import com.yujin.record.calendar.firstDay
 import kotlinx.coroutines.flow.map
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
 import kotlinx.datetime.YearMonth
-import kotlinx.datetime.isoDayNumber
 import kotlinx.datetime.number
 import kotlinx.datetime.plus
-import kotlin.math.ceil
+import kotlinx.datetime.todayIn
+import kotlin.time.Clock
 
 private const val RANGE = 1_200 // 100 year
 private const val BASE_PAGE = RANGE / 2 // for infinite swipe
 
-internal fun betweenMonth(start: YearMonth, end: YearMonth) = (end.year - start.year) * 12 +
-        (end.month.number - start.month.number)
-
-private fun getWeekCount(month: YearMonth): Int {
-    val startOffset = month.firstDay().dayOfWeek.isoDayNumber % 7
-    val daysInMonth = month.numberOfDays
-    return ceil((startOffset + daysInMonth) / 7f).toInt()
-}
+internal fun betweenMonth(start: YearMonth, end: YearMonth) =
+    (end.year - start.year) * 12 + (end.month.number - start.month.number)
 
 @Composable
 fun CalendarPager(
     state: CalendarContentUiState,
     selectedDate: LocalDate,
     onAction: (CalendarUiAction) -> Unit,
+    goToTodayRequestId: Int,
 ) {
     val anchorYearMonth = remember { state.displayedYearMonth }
     val currentState by rememberUpdatedState(state)
@@ -50,6 +45,15 @@ fun CalendarPager(
         val targetPage = BASE_PAGE + betweenMonth(anchorYearMonth, state.displayedYearMonth)
         if (pagerState.currentPage != targetPage) {
             pagerState.scrollToPage(targetPage)
+        }
+    }
+
+    LaunchedEffect(goToTodayRequestId) {
+        if (goToTodayRequestId > 0) {
+            val today = Clock.System.todayIn(TimeZone.currentSystemDefault())
+            val todayMonth = YearMonth(today.year, today.month)
+            val todayPage = BASE_PAGE + betweenMonth(anchorYearMonth, todayMonth)
+            pagerState.animateScrollToPage(todayPage)
         }
     }
 

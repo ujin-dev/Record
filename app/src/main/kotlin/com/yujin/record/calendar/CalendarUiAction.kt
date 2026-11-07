@@ -8,4 +8,5 @@ sealed interface CalendarUiAction {
     data class MonthChanged(val month: YearMonth) : CalendarUiAction
     data class ReviewClicked(val reviewId: Long) : CalendarUiAction
     data object CreateReviewClicked : CalendarUiAction
+    data object GoToTodayClicked : CalendarUiAction
 }

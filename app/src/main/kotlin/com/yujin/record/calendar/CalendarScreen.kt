@@ -17,10 +17,12 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.PostAdd
+import androidx.compose.material.icons.outlined.Today
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Surface
@@ -68,6 +70,19 @@ fun CalendarScreen(
                     fontWeight = FontWeight.SemiBold,
                 )
             },
+            actions = {
+                IconButton(
+                    onClick = {
+                        onAction(CalendarUiAction.GoToTodayClicked)
+                    }
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.Today,
+                        contentDescription = "오늘로 이동",
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+            }
         )
 
         BottomSheetScaffold(
@@ -120,6 +135,7 @@ fun CalendarScreen(
                     state = uiState.calendarState,
                     selectedDate = uiState.selectedDate,
                     onAction = onAction,
+                    goToTodayRequestId = uiState.goToTodayRequestId,
                 )
             }
         }

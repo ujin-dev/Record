@@ -7,82 +7,73 @@ import com.yujin.record.data.repository.ReviewRepository
 import com.yujin.record.model.Review
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.YearMonth
-import kotlinx.datetime.toLocalDateTime
+import kotlinx.datetime.todayIn
 import javax.inject.Inject
 import kotlin.time.Clock
 
 @HiltViewModel
 class CalendarViewModel @Inject constructor(
-    private val reviewRepository: ReviewRepository
+    private val reviewRepository: ReviewRepository,
 ) : ViewModel() {
-    private val selectedDate: MutableStateFlow<LocalDate> = MutableStateFlow(
-        Clock.System.now()
-            .toLocalDateTime(TimeZone.currentSystemDefault())
-            .date
-    )
+    private var today: LocalDate = Clock.System.todayIn(TimeZone.currentSystemDefault())
 
-    private val currentMonth: MutableStateFlow<YearMonth> =
-        MutableStateFlow(selectedDate.value.toYearMonth())
+    private val currentMonth = MutableStateFlow(today.toYearMonth())
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    private val monthlyReviews: Flow<List<Review>> =
-        currentMonth
-            .flatMapLatest { month ->
-                reviewRepository.observeReviewsByMonth(month)
-            }.map { list ->
-                list.map { it.toReview() }
-            }
+    private val monthlyReviews = currentMonth
+        .flatMapLatest { month -> reviewRepository.observeReviewsByMonth(month) }
+        .map { list -> list.map { it.toReview() } }
 
-    val uiState: StateFlow<CalendarUiState> =
-        combine(
-            currentMonth,
-            selectedDate,
-            monthlyReviews,
-        ) { month, date, reviews ->
-            CalendarUiState(
-                selectedDate = date,
-                calendarState = CalendarContentUiState(
-                    displayedYearMonth = month,
-                    cellStatesByDate = reviews
-                        .groupBy { it.createdAt.toLocalDate() }
-                        .mapValues { (date, reviews) ->
-                            CalendarCellUiState(
-                                date = date,
-                                reviewCount = reviews.size,
-                                thumbnailUrl = reviews.lastOrNull()?.images?.firstOrNull()?.uri
-                            )
-                        }
-                ),
-                monthlyReviews = reviews
-            )
-        }.stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = CalendarUiState(
-                selectedDate = selectedDate.value,
-                calendarState = CalendarContentUiState(
-                    displayedYearMonth = currentMonth.value,
-                )
+    private val _uiState = MutableStateFlow(
+        CalendarUiState(
+            selectedDate = today,
+            calendarState = CalendarContentUiState(
+                displayedYearMonth = today.toYearMonth(),
             )
         )
+    )
+    val uiState = _uiState.asStateFlow()
 
-    private val _uiEvent: MutableSharedFlow<CalendarUiEvent> = MutableSharedFlow()
-    val uiEvent: SharedFlow<CalendarUiEvent> = _uiEvent.asSharedFlow()
+    private val _uiEvent = MutableSharedFlow<CalendarUiEvent>()
+    val uiEvent = _uiEvent.asSharedFlow()
+
+    init {
+        viewModelScope.launch {
+            monthlyReviews.collect(::updateMonthlyReviews)
+        }
+    }
+
+    private fun updateMonthlyReviews(reviews: List<Review>) {
+        _uiState.update { state ->
+            state.copy(
+                monthlyReviews = reviews,
+                calendarState = state.calendarState.copy(
+                    cellStatesByDate = reviews.toCalendarCellStates()
+                )
+            )
+        }
+    }
+
+    private fun List<Review>.toCalendarCellStates(): Map<LocalDate, CalendarCellUiState> =
+        groupBy { it.createdAt.toLocalDate() }
+            .mapValues { (date, reviews) ->
+                CalendarCellUiState(
+                    date = date,
+                    reviewCount = reviews.size,
+                    thumbnailUrl = reviews.lastOrNull()?.images?.firstOrNull()?.uri
+                )
+            }
 
     fun onAction(action: CalendarUiAction) {
         when (action) {
@@ -90,26 +81,51 @@ class CalendarViewModel @Inject constructor(
             is CalendarUiAction.DateClicked -> onDateClick(action.date)
             is CalendarUiAction.CreateReviewClicked -> onCreateReviewClick()
             is CalendarUiAction.ReviewClicked -> onReviewClick(action.reviewId)
+            is CalendarUiAction.GoToTodayClicked -> onGoToTodayClick()
         }
     }
 
-    fun onMonthChange(month: YearMonth) {
+    private fun onMonthChange(month: YearMonth) {
+        _uiState.update {
+            it.copy(
+                monthlyReviews = emptyList(),
+                calendarState = CalendarContentUiState(displayedYearMonth = month)
+            )
+        }
         currentMonth.value = month
     }
 
-    fun onDateClick(date: LocalDate) {
-        selectedDate.value = date
+    private fun onDateClick(date: LocalDate) {
+        _uiState.update {
+            it.copy(selectedDate = date)
+        }
     }
 
-    fun onCreateReviewClick() {
+    private fun onGoToTodayClick() {
+        today = Clock.System.todayIn(TimeZone.currentSystemDefault())
+        _uiState.update {
+            it.copy(
+                monthlyReviews = emptyList(),
+                calendarState = CalendarContentUiState(
+                    displayedYearMonth = today.toYearMonth(),
+                ),
+                goToTodayRequestId = it.goToTodayRequestId + 1
+            )
+        }
+        currentMonth.value = today.toYearMonth()
+    }
+
+    private fun onCreateReviewClick() {
         viewModelScope.launch {
             _uiEvent.emit(
-                CalendarUiEvent.NavigateToCreate(selectedDate.value.toString())
+                CalendarUiEvent.NavigateToCreate(
+                    _uiState.value.selectedDate.toString()
+                )
             )
         }
     }
 
-    fun onReviewClick(reviewId: Long) {
+    private fun onReviewClick(reviewId: Long) {
         viewModelScope.launch {
             _uiEvent.emit(CalendarUiEvent.NavigateToDetail(reviewId))
         }
