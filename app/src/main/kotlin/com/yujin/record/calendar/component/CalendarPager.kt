@@ -9,6 +9,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import com.yujin.record.calendar.CalendarContentUiState
 import com.yujin.record.calendar.CalendarUiAction
 import kotlinx.coroutines.flow.map
@@ -33,6 +34,7 @@ fun CalendarPager(
     selectedDate: LocalDate,
     onAction: (CalendarUiAction) -> Unit,
     goToTodayRequestId: Int,
+    modifier: Modifier = Modifier,
 ) {
     val anchorYearMonth = remember { state.displayedYearMonth }
     val currentState by rememberUpdatedState(state)
@@ -70,7 +72,8 @@ fun CalendarPager(
 
     HorizontalPager(
         state = pagerState,
-        beyondViewportPageCount = 3,
+        modifier = modifier,
+        beyondViewportPageCount = 11,
         verticalAlignment = Alignment.Top,
     ) { page ->
         val month = anchorYearMonth.plus(page - BASE_PAGE, DateTimeUnit.MONTH)

@@ -19,14 +19,13 @@ import androidx.compose.ui.Alignment.Companion.BottomCenter
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 
 @Composable
-fun DateCell(
+fun CalendarCell(
     modifier: Modifier = Modifier,
     date: Int,
     isSelected: Boolean,
@@ -36,19 +35,15 @@ fun DateCell(
 ) {
     Box(
         modifier = modifier
-            .background(
-                color = MaterialTheme.colorScheme.surfaceContainer,
-                shape = RoundedCornerShape(8.dp)
-            )
+            .clip(shape = RoundedCornerShape(8.dp))
             .clickable(onClick = onClick)
+            .background(color = MaterialTheme.colorScheme.surfaceContainer)
     ) {
         if (thumbnailUri != null) {
             AsyncImage(
                 model = thumbnailUri,
                 contentDescription = null,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .clip(RoundedCornerShape(8.dp)),
+                modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop,
             )
         } else {

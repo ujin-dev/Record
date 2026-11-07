@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -37,9 +38,11 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.yujin.record.calendar.component.CalendarPager
+import com.yujin.record.calendar.component.EmptyReviewRow
 import com.yujin.record.calendar.component.ReviewItemView
 import com.yujin.record.calendar.component.WeekDayRow
 import com.yujin.record.ui.theme.Dimens
+import com.yujin.record.ui.toDisplayString
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -47,14 +50,9 @@ fun CalendarScreen(
     uiState: CalendarUiState,
     onAction: (CalendarUiAction) -> Unit,
 ) {
-    val scaffoldState = rememberBottomSheetScaffoldState(
-        bottomSheetState = rememberStandardBottomSheetState(
-            initialValue = SheetValue.PartiallyExpanded
-        )
-    )
     val handlerHeight = 48.dp
     val minContentHeight = 72.dp
-    val sheetPeekHeight = handlerHeight + minContentHeight * 1.5f
+    val sheetPeekHeight = handlerHeight + minContentHeight
 
     Column(
         Modifier
@@ -88,27 +86,13 @@ fun CalendarScreen(
         BottomSheetScaffold(
             sheetContent = {
                 if (uiState.monthlyReviews.isEmpty()) {
-                    Column(
+                    EmptyReviewRow(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(minContentHeight * 1.5f),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.Outlined.PostAdd,
-                            contentDescription = "empty review",
-                            modifier = Modifier.size(24.dp),
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                        Text(
-                            text = "이 달의 리뷰를 작성해 보세요.",
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            style = MaterialTheme.typography.titleMedium,
-                        )
-                    }
+                            .wrapContentHeight()
+                    )
                 } else {
-                    LazyColumn(Modifier.fillMaxHeight()) {
+                    LazyColumn(Modifier.fillMaxWidth()) {
                         items(
                             items = uiState.monthlyReviews,
                             key = { review -> review.id }
@@ -121,7 +105,11 @@ fun CalendarScreen(
                 }
             },
             modifier = Modifier.weight(1f),
-            scaffoldState = scaffoldState,
+            scaffoldState = rememberBottomSheetScaffoldState(
+                bottomSheetState = rememberStandardBottomSheetState(
+                    initialValue = SheetValue.PartiallyExpanded
+                )
+            ),
             sheetPeekHeight = sheetPeekHeight,
         ) { innerPadding ->
             Column(
@@ -136,6 +124,7 @@ fun CalendarScreen(
                     selectedDate = uiState.selectedDate,
                     onAction = onAction,
                     goToTodayRequestId = uiState.goToTodayRequestId,
+                    modifier = Modifier.fillMaxHeight()
                 )
             }
         }
@@ -154,7 +143,7 @@ fun CalendarScreen(
                 shape = RoundedCornerShape(16.dp),
             ) {
                 Text(
-                    text = "리뷰 작성",
+                    text = "${uiState.selectedDate.toDisplayString()} 리뷰 작성",
                     style = MaterialTheme.typography.titleMedium
                 )
             }
