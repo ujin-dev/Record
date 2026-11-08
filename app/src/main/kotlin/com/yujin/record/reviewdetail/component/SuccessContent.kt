@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.yujin.record.reviewdetail.ReviewDetailScreenState
 import com.yujin.record.ui.MEDIA_COVER_ASPECT_RATIO
+import com.yujin.record.ui.theme.Dimens
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -47,7 +48,11 @@ fun SuccessContent(
                     modifier = Modifier
                         .fillMaxWidth()
                         .verticalScroll(rememberScrollState())
-                        .padding(start = 32.dp, end = 32.dp, bottom = 32.dp)
+                        .padding(
+                            start = Dimens.bottomSheetPadding,
+                            end = Dimens.bottomSheetPadding,
+                            bottom = Dimens.bottomSheetPadding
+                        )
                 )
             },
             modifier = Modifier

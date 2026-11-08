@@ -19,9 +19,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.yujin.record.model.ReviewType
 import com.yujin.record.model.MediaItem
-import com.yujin.record.ui.BOTTOM_SHEET_PADDING
+import com.yujin.record.model.ReviewType
+import com.yujin.record.ui.theme.Dimens
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -43,12 +43,12 @@ fun SearchResultBottomSheet(
             modifier = Modifier
                 .fillMaxWidth()
                 .navigationBarsPadding()
-                .padding(bottom = BOTTOM_SHEET_PADDING.dp)
+                .padding(bottom = Dimens.bottomSheetPadding)
         ) {
             Text(
                 text = "영화를 선택해 주세요.",
                 style = MaterialTheme.typography.headlineSmall,
-                modifier = Modifier.padding(start = BOTTOM_SHEET_PADDING.dp)
+                modifier = Modifier.padding(start = Dimens.bottomSheetPadding)
             )
 
             Spacer(Modifier.height(16.dp))
@@ -57,7 +57,7 @@ fun SearchResultBottomSheet(
                 modifier = Modifier
                     .horizontalScroll(rememberScrollState())
                     .fillMaxWidth()
-                    .padding(horizontal = BOTTOM_SHEET_PADDING.dp),
+                    .padding(horizontal = Dimens.bottomSheetPadding),
                 horizontalArrangement = Arrangement.spacedBy(4.dp),
             ) {
                 medias.forEach { media ->
