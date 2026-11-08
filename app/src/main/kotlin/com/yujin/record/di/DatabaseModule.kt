@@ -1,4 +1,4 @@
-package com.yujin.record.database.di
+package com.yujin.record.di
 
 import android.content.Context
 import androidx.room.Room

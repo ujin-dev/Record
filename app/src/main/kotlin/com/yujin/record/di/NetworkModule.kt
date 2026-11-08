@@ -1,4 +1,4 @@
-package com.yujin.record.data.di
+package com.yujin.record.di
 
 import com.yujin.record.BuildConfig
 import com.yujin.record.data.remote.TmdbApi

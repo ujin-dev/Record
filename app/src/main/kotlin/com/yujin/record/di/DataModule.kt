@@ -1,4 +1,4 @@
-package com.yujin.record.data.di
+package com.yujin.record.di
 
 import com.yujin.record.data.repository.ReviewRepository
 import com.yujin.record.data.repository.ReviewRepositoryImpl

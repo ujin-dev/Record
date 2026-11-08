@@ -26,7 +26,7 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 import javax.inject.Inject
 
-private const val TMDB_IMAGE_BASE_URL = "https://image.tmdb.org/t/p/h632"
+private const val TMDB_IMAGE_BASE_URL = "https://image.tmdb.org/t/p/original"
 
 @HiltViewModel
 class ReviewFormViewModel @Inject constructor(

@@ -1,6 +1,8 @@
 package com.yujin.record.data
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import androidx.core.net.toUri
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -9,8 +11,10 @@ import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
+import java.io.InputStream
 import java.net.HttpURLConnection
 import java.net.URL
+import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -25,8 +29,9 @@ class ImageStorage @Inject constructor(
         }
 
     suspend fun backupImage(sourceUri: Uri): Uri = withContext(Dispatchers.IO) {
-        val fileName = "record_${System.currentTimeMillis()}.jpg"
-        val targetFile = File(imageDir, fileName)
+        val fileName = "${UUID.randomUUID()}"
+        val tempFile = File(imageDir, "$fileName.tmp")
+        val targetFile = File(imageDir, "$fileName.jpg")
 
         val inputStream = when (sourceUri.scheme?.lowercase()) {
             "http", "https" -> {
@@ -52,13 +57,14 @@ class ImageStorage @Inject constructor(
         try {
             requireNotNull(inputStream) { "이미지 입력 스트림을 열 수 없습니다: $sourceUri" }
                 .use { input ->
-                    FileOutputStream(targetFile).use { output ->
-                        input.copyTo(output)
-                    }
+                    tempFile.outputStream().use { output -> input.copyTo(output) }
                 }
+            resizeAndSave(tempFile.inputStream(), targetFile)
         } catch (e: Exception) {
             targetFile.delete()
             throw e
+        } finally {
+            tempFile.delete()
         }
 
         targetFile.toUri()
@@ -74,4 +80,31 @@ class ImageStorage @Inject constructor(
         uri.path?.let { path ->
             path.startsWith(imageDir.absolutePath) && File(path).exists()
         } == true
+
+    private fun resizeAndSave(input: InputStream, targetFile: File) {
+        val bounds = BitmapFactory.Options().apply {
+            inJustDecodeBounds = true
+        }
+        input.use { BitmapFactory.decodeStream(it, null, bounds) }
+
+        require(bounds.outWidth > 0 && bounds.outHeight > 0) {
+            "이미지 파일을 읽을 수 없습니다."
+        }
+
+        val maxWidth = 600
+        val sampleSize = (bounds.outWidth / maxWidth).coerceAtLeast(1)
+
+        val bitmap = BitmapFactory.Options().run {
+            inSampleSize = sampleSize
+            targetFile.inputStream().use { BitmapFactory.decodeStream(it, null, this) }
+        } ?: throw IOException("이미지 디코딩에 실패했습니다.")
+
+        try {
+            FileOutputStream(targetFile).use { output ->
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 90, output)
+            }
+        } finally {
+            bitmap.recycle()
+        }
+    }
 }
