@@ -60,7 +60,7 @@ fun SuccessContent(
                 .windowInsetsPadding(WindowInsets.navigationBars),
             scaffoldState = rememberBottomSheetScaffoldState(
                 bottomSheetState = rememberStandardBottomSheetState(
-                    initialValue = SheetValue.PartiallyExpanded
+                    initialValue = SheetValue.Expanded
                 )
             ),
             sheetPeekHeight = maxHeight - (maxHeight * MEDIA_COVER_ASPECT_RATIO),

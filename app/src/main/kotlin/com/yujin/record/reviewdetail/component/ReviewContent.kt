@@ -74,7 +74,6 @@ fun ReviewContent(
             // title
             Text(
                 text = uiState.review.title,
-                fontSize = 23.sp,
                 fontWeight = FontWeight.ExtraBold,
                 style = MaterialTheme.typography.headlineLarge,
             )
@@ -82,7 +81,9 @@ fun ReviewContent(
             if (uiState.review.creatorName.isNotEmpty()) {
                 Text(
                     text = uiState.review.creatorName,
-                    style = MaterialTheme.typography.bodyLarge,
+                    style = MaterialTheme.typography.bodyLarge.copy(
+                        fontSize = 18.sp,
+                    ),
                 )
             }
         }
@@ -109,8 +110,9 @@ fun ReviewContent(
                 )
                 Text(
                     text = uiState.review.type.displayName,
-                    style = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier.offset(y = (-1.5).dp)
+                    style = MaterialTheme.typography.bodyLarge.copy(
+                        fontSize = 18.sp,
+                    ),
                 )
 
                 Text(text = " · ", fontWeight = FontWeight.ExtraBold)
@@ -123,7 +125,9 @@ fun ReviewContent(
                 )
                 Text(
                     text = uiState.review.rating.toString(),
-                    style = MaterialTheme.typography.bodyLarge,
+                    style = MaterialTheme.typography.bodyLarge.copy(
+                        fontSize = 18.sp,
+                    ),
                 )
             }
 
@@ -131,7 +135,7 @@ fun ReviewContent(
             Text(
                 text = uiState.review.createdAt.toDisplayString(),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                style = MaterialTheme.typography.bodySmall,
+                style = MaterialTheme.typography.bodyLarge,
             )
         }
 
@@ -153,7 +157,9 @@ fun ReviewContent(
         // content
         Text(
             text = uiState.review.content,
-            style = MaterialTheme.typography.bodyLarge,
+            style = MaterialTheme.typography.bodyLarge.copy(
+                fontSize = 20.sp,
+            ),
         )
     }
 }
