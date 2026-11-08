@@ -4,6 +4,7 @@ import android.net.Uri
 import android.util.Log
 import androidx.core.net.toUri
 import androidx.room.withTransaction
+import com.yujin.record.BuildConfig
 import com.yujin.record.data.ImageStorage
 import com.yujin.record.data.mapper.toEntity
 import com.yujin.record.data.mapper.toReview
@@ -102,6 +103,9 @@ class ReviewRepositoryImpl @Inject constructor(
                     }
                 }
             } catch (e: Exception) {
+                if (BuildConfig.DEBUG) {
+                    Log.e("update", "이미지 저장 실패", e)
+                }
                 runCatching {
                     if (backupUris.isNotEmpty()) {
                         imageStorage.deleteImages(backupUris)

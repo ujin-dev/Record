@@ -59,7 +59,7 @@ class ImageStorage @Inject constructor(
                 .use { input ->
                     tempFile.outputStream().use { output -> input.copyTo(output) }
                 }
-            resizeAndSave(tempFile.inputStream(), targetFile)
+            resizeAndSave(tempFile, targetFile)
         } catch (e: Exception) {
             targetFile.delete()
             throw e
@@ -81,11 +81,11 @@ class ImageStorage @Inject constructor(
             path.startsWith(imageDir.absolutePath) && File(path).exists()
         } == true
 
-    private fun resizeAndSave(input: InputStream, targetFile: File) {
+    private fun resizeAndSave(input: File, targetFile: File) {
         val bounds = BitmapFactory.Options().apply {
             inJustDecodeBounds = true
         }
-        input.use { BitmapFactory.decodeStream(it, null, bounds) }
+        input.inputStream().use { BitmapFactory.decodeStream(it, null, bounds) }
 
         require(bounds.outWidth > 0 && bounds.outHeight > 0) {
             "이미지 파일을 읽을 수 없습니다."
@@ -96,7 +96,7 @@ class ImageStorage @Inject constructor(
 
         val bitmap = BitmapFactory.Options().run {
             inSampleSize = sampleSize
-            targetFile.inputStream().use { BitmapFactory.decodeStream(it, null, this) }
+            input.inputStream().use { BitmapFactory.decodeStream(it, null, this) }
         } ?: throw IOException("이미지 디코딩에 실패했습니다.")
 
         try {
