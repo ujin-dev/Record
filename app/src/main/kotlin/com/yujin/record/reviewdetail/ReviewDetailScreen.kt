@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -17,27 +18,36 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.LiveTv
+import androidx.compose.material.icons.filled.Movie
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalMinimumInteractiveComponentSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SheetValue
+import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -53,9 +63,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.view.WindowCompat
 import coil3.compose.AsyncImage
+import com.yujin.record.model.ReviewType
+import com.yujin.record.reviewdetail.component.TopAppBarIconButton
 import com.yujin.record.ui.MEDIA_COVER_ASPECT_RATIO
 import com.yujin.record.ui.toDisplayString
-import com.yujin.record.reviewdetail.component.TopAppBarIconButton
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -159,23 +170,25 @@ fun NotFoundScreen() {
 fun SuccessScreen(
     uiState: ReviewDetailScreenState.Success,
 ) {
-    val scaffoldState = rememberBottomSheetScaffoldState(
-        bottomSheetState = rememberStandardBottomSheetState(
-            initialValue = SheetValue.PartiallyExpanded
-        )
-    )
+    val thumbUri = remember { mutableStateOf(uiState.review.images.firstOrNull()?.uri) }
 
-    BoxWithConstraints(Modifier.fillMaxSize()) {
-        val thumbUri = remember { mutableStateOf(uiState.review.images.firstOrNull()?.uri) }
-        val onClicked = { uri: Uri -> thumbUri.value = uri }
-
+    BoxWithConstraints {
         BottomSheetScaffold(
-            scaffoldState = scaffoldState,
-            sheetPeekHeight = maxHeight / 2,
+            sheetContent = {
+                ContentView(
+                    uiState = uiState,
+                    onClicked = { uri -> thumbUri.value = uri }
+                )
+            },
             modifier = Modifier
-                .windowInsetsPadding(WindowInsets.navigationBars)
-                .fillMaxSize(),
-            sheetContent = { ContentView(uiState = uiState, onClicked = onClicked) }
+                .fillMaxSize()
+                .windowInsetsPadding(WindowInsets.navigationBars),
+            scaffoldState = rememberBottomSheetScaffoldState(
+                bottomSheetState = rememberStandardBottomSheetState(
+                    initialValue = SheetValue.PartiallyExpanded
+                )
+            ),
+            sheetPeekHeight = maxHeight - (maxHeight * MEDIA_COVER_ASPECT_RATIO),
         ) { _ ->
             Box {
                 AsyncImage(
@@ -212,11 +225,14 @@ fun ContentView(
     onClicked: (Uri) -> Unit
 ) {
     Column(
+        verticalArrangement = Arrangement.spacedBy(15.dp),
         modifier = Modifier
             .fillMaxWidth()
+            .verticalScroll(rememberScrollState())
             .padding(start = 32.dp, end = 32.dp, bottom = 32.dp)
     ) {
         if (uiState.review.images.size > 1) {
+            // images
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(
@@ -239,57 +255,89 @@ fun ContentView(
                     )
                 }
             }
-            Spacer(Modifier.height(20.dp))
         }
 
-        Text(
-            text = uiState.review.title,
-            fontSize = 23.sp,
-            fontWeight = FontWeight.ExtraBold,
-            style = MaterialTheme.typography.headlineLarge,
-        )
-        Text(
-            text = uiState.review.createdAt.toDisplayString(),
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            style = MaterialTheme.typography.bodySmall,
-        )
-
-        Spacer(Modifier.height(10.dp))
-
-        if (uiState.review.creatorName.isNotEmpty()) {
+        Column(modifier = Modifier.fillMaxWidth()) {
+            // title
             Text(
-                text = uiState.review.creatorName,
-                style = MaterialTheme.typography.bodyLarge,
+                text = uiState.review.title,
+                fontSize = 23.sp,
+                fontWeight = FontWeight.ExtraBold,
+                style = MaterialTheme.typography.headlineLarge,
             )
-        }
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(
-                text = uiState.review.type.displayName,
-                style = MaterialTheme.typography.bodyLarge
-            )
-            Text(text = " · ", fontWeight = FontWeight.ExtraBold)
-            // rating
-            Icon(
-                imageVector = Icons.Default.Star,
-                contentDescription = null,
-                modifier = Modifier.size(16.dp),
-            )
-            Text(
-                text = uiState.review.rating.toString(),
-                style = MaterialTheme.typography.bodyLarge
-            )
-        }
 
-        Spacer(Modifier.height(15.dp))
-
-        Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
-            uiState.review.tags.forEach { tag ->
-                Text(text = "#$tag")
+            if (uiState.review.creatorName.isNotEmpty()) {
+                Text(
+                    text = uiState.review.creatorName,
+                    style = MaterialTheme.typography.bodyLarge,
+                )
             }
         }
 
-        Spacer(Modifier.height(15.dp))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(2.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                // review type
+                Icon(
+                    imageVector =
+                        when (uiState.review.type) {
+                            ReviewType.MOVIE -> Icons.Filled.Movie
+                            ReviewType.TV_SERIES -> Icons.Filled.LiveTv
+                            ReviewType.BOOK -> Icons.AutoMirrored.Filled.MenuBook
+                        },
+                    contentDescription = "review type icon",
+                    modifier = Modifier.size(20.dp)
+                )
+                Text(
+                    text = uiState.review.type.displayName,
+                    style = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier.offset(y = (-1.5).dp)
+                )
 
+                Text(text = " · ", fontWeight = FontWeight.ExtraBold)
+
+                // rating
+                Icon(
+                    imageVector = Icons.Default.Star,
+                    contentDescription = "rating icon",
+                    modifier = Modifier.size(20.dp)
+                )
+                Text(
+                    text = uiState.review.rating.toString(),
+                    style = MaterialTheme.typography.bodyLarge,
+                )
+            }
+
+            // created at
+            Text(
+                text = uiState.review.createdAt.toDisplayString(),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.bodySmall,
+            )
+        }
+
+        // tags
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(2.dp),
+            verticalArrangement = Arrangement.spacedBy(2.dp)
+        ) {
+            uiState.review.tags.forEach { tag ->
+                CompositionLocalProvider(LocalMinimumInteractiveComponentSize provides 0.dp) {
+                    SuggestionChip(
+                        onClick = { /*TODO*/ },
+                        label = { Text(text = tag) },
+                    )
+                }
+            }
+        }
+
+        // content
         Text(
             text = uiState.review.content,
             style = MaterialTheme.typography.bodyLarge,

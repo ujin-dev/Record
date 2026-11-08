@@ -11,7 +11,7 @@ import kotlin.time.Instant
 
 @OptIn(FormatStringsInDatetimeFormats::class)
 private val fullPattern = LocalDateTime.Format {
-    byUnicodePattern("yyyy.MM.dd HH:mm:ss")
+    byUnicodePattern("yyyy.MM.dd HH:mm")
 }
 
 fun Instant.toDisplayString(): String =
