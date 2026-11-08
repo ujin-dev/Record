@@ -197,7 +197,11 @@ fun ReviewFormScreen(
                     label = "제목",
                     placeholder = "작품명을 입력하세요",
                     trailingIcon = {
-                        if (uiState.id == 0L && uiState.type == ReviewType.MOVIE) {
+                        if (uiState.id == 0L && uiState.type in listOf(
+                                ReviewType.MOVIE,
+                                ReviewType.TV_SERIES
+                            )
+                        ) {
                             IconButton(onClick = {
                                 keyboardController?.hide()
                                 focusManager.clearFocus()
@@ -224,7 +228,11 @@ fun ReviewFormScreen(
                             )
                         )
                     },
-                    label = if (uiState.type == ReviewType.MOVIE) "제작자" else "저자",
+                    label = if (uiState.type in listOf(
+                            ReviewType.MOVIE,
+                            ReviewType.TV_SERIES
+                        )
+                    ) "제작자" else "저자",
                     placeholder = "이름을 입력하세요",
                     imeAction = ImeAction.Next,
                 )
