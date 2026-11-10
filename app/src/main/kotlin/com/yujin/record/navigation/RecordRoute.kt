@@ -1,0 +1,20 @@
+package com.yujin.record.navigation
+
+import kotlinx.serialization.Serializable
+
+@Serializable
+sealed interface RecordRoute {
+    @Serializable
+    data object Calendar : RecordRoute
+
+    @Serializable
+    data class ReviewForm(
+        val reviewId: Long? = null,
+        val createdDate: String? = null
+    ) : RecordRoute
+
+    @Serializable
+    data class ReviewDetail(
+        val reviewId: Long
+    ) : RecordRoute
+}

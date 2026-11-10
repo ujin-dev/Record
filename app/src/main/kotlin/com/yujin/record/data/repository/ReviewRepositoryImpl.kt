@@ -5,15 +5,16 @@ import android.util.Log
 import androidx.core.net.toUri
 import androidx.room.withTransaction
 import com.yujin.record.BuildConfig
-import com.yujin.record.data.ImageStorage
-import com.yujin.record.data.mapper.toEntity
-import com.yujin.record.data.mapper.toReview
-import com.yujin.record.database.AppDatabase
-import com.yujin.record.database.dao.ImageDao
-import com.yujin.record.database.dao.ReviewDao
-import com.yujin.record.database.model.ReviewWithImages
-import com.yujin.record.model.Review
+import com.yujin.record.data.database.AppDatabase
+import com.yujin.record.data.database.dao.ImageDao
+import com.yujin.record.data.database.dao.ReviewDao
+import com.yujin.record.data.database.mapper.toEntity
+import com.yujin.record.data.database.mapper.toReview
+import com.yujin.record.data.storage.ImageStorage
+import com.yujin.record.domain.model.Review
+import com.yujin.record.domain.repository.ReviewRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.YearMonth
@@ -135,18 +136,22 @@ class ReviewRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun observeReviewsByDate(date: LocalDate): Flow<List<ReviewWithImages>> {
+    override fun observeReviewsByDate(date: LocalDate): Flow<List<Review>> {
         val zoneId = ZoneId.systemDefault()
         val start = date.atStartOfDayIn(zoneId.toKotlinTimeZone())
         val end = date.plus(period = DatePeriod(days = 1)).atStartOfDayIn(zoneId.toKotlinTimeZone())
+
         return reviewDao.observeByDateRange(start, end)
+            .map { reviews -> reviews.map { it.toReview() } }
     }
 
-    override fun observeReviewsByMonth(month: YearMonth): Flow<List<ReviewWithImages>> {
+    override fun observeReviewsByMonth(month: YearMonth): Flow<List<Review>> {
         val zoneId = ZoneId.systemDefault()
         val start = month.firstDay.atStartOfDayIn(zoneId.toKotlinTimeZone())
         val end = month.lastDay.plus(period = DatePeriod(days = 1))
             .atStartOfDayIn(zoneId.toKotlinTimeZone())
+
         return reviewDao.observeByDateRange(start, end)
+            .map { reviews -> reviews.map { it.toReview() } }
     }
 }

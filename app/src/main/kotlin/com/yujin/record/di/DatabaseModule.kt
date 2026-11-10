@@ -3,9 +3,9 @@ package com.yujin.record.di
 import android.content.Context
 import androidx.room.Room
 import com.yujin.record.BuildConfig
-import com.yujin.record.database.AppDatabase
-import com.yujin.record.database.dao.ImageDao
-import com.yujin.record.database.dao.ReviewDao
+import com.yujin.record.data.database.AppDatabase
+import com.yujin.record.data.database.dao.ImageDao
+import com.yujin.record.data.database.dao.ReviewDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
