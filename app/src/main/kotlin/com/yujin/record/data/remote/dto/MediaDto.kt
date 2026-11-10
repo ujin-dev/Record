@@ -12,7 +12,7 @@ data class MediaDto(
     @SerialName("poster_path")
     val posterPath: String?,
     @SerialName("media_type")
-    val mediaType: TmdbMediaType = TmdbMediaType.UNKNOWN,
+    val mediaType: TmdbMediaType? = null,
     @SerialName("release_date")
     val releaseDate: String? = null,
 )

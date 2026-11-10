@@ -1,20 +1,22 @@
 package com.yujin.record.presentation.reviewform
 
 import android.net.Uri
-import android.util.Log
 import androidx.core.net.toUri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
+import com.yujin.record.domain.model.ImageItem
+import com.yujin.record.domain.model.ReviewType
+import com.yujin.record.domain.model.Video
+import com.yujin.record.domain.repository.ReviewRepository
+import com.yujin.record.domain.usecase.GetMovieDetailUseCase
+import com.yujin.record.domain.usecase.GetTvSeriesDetailUseCase
+import com.yujin.record.domain.usecase.SearchVideoResult
+import com.yujin.record.domain.usecase.SearchVideoUseCase
+import com.yujin.record.domain.usecase.VideoDetailResult
 import com.yujin.record.navigation.RecordRoute
 import com.yujin.record.presentation.calendar.toInstant
-import com.yujin.record.data.repository.MediaRepository
-import com.yujin.record.domain.repository.ReviewRepository
-import com.yujin.record.domain.model.ImageItem
-import com.yujin.record.domain.model.Video
-import com.yujin.record.domain.model.ReviewType
-import com.yujin.record.domain.model.TmdbMedia
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,13 +28,14 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 import javax.inject.Inject
 
-private const val TMDB_IMAGE_BASE_URL = "https://image.tmdb.org/t/p/original"
 
 @HiltViewModel
 class ReviewFormViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val reviewRepository: ReviewRepository,
-    private val mediaRepository: MediaRepository,
+    private val searchVideoUseCase: SearchVideoUseCase,
+    private val getMovieDetailUseCase: GetMovieDetailUseCase,
+    private val getTvSeriesDetailUseCase: GetTvSeriesDetailUseCase,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(ReviewFormUiState())
     val uiState: StateFlow<ReviewFormUiState> = _uiState.asStateFlow()
@@ -79,8 +82,11 @@ class ReviewFormViewModel @Inject constructor(
             is ReviewFormUiAction.TagRemoved -> onTagRemoved(action.tag)
             is ReviewFormUiAction.SearchResultItemClicked ->
                 when (action.type) {
-                    ReviewType.MOVIE -> getMovieDetail(action.mediaId)
-                    ReviewType.TV_SERIES -> getTvSeriesDetail(action.mediaId)
+                    ReviewType.MOVIE, ReviewType.TV_SERIES -> loadVideoDetail(
+                        action.type,
+                        action.mediaId
+                    )
+
                     else -> {}
                 }
 
@@ -129,126 +135,86 @@ class ReviewFormViewModel @Inject constructor(
 
     private fun search() = viewModelScope.launch {
         when (_uiState.value.type) {
-            ReviewType.MOVIE, ReviewType.TV_SERIES -> searchMedia()
+            ReviewType.MOVIE, ReviewType.TV_SERIES -> searchVideo()
             ReviewType.BOOK -> searchBooks()
         }
     }
 
-    private suspend fun searchMedia() {
-        val title = _uiState.value.title
+    private suspend fun searchVideo() {
+        _uiState.update { it.copy(overlay = Overlay.Progress) }
 
-        if (title.isEmpty()) {
-            // todo empty query
-
-        } else {
-            _uiState.update { it.copy(overlay = Overlay.Progress) }
-
-            mediaRepository.searchVideo(_uiState.value.title)
-                .onSuccess { result: List<TmdbMedia> ->
-                    Log.d("search", result.size.toString())
-
-                    when {
-                        result.isEmpty() -> {
-                            // todo snack bar empty result
-                        }
-
-                        result.size == 1 -> {
-                            _uiState.update { it.copy(overlay = Overlay.Progress) }
-
-                            val media = result.first()
-                            when (media.videoType) {
-                                ReviewType.MOVIE -> getMovieDetail(media.id)
-                                ReviewType.TV_SERIES -> getTvSeriesDetail(media.id)
-                                else -> Unit
-                            }
-                        }
-
-                        else -> {
-                            _uiState.update {
-                                it.copy(
-                                    overlay = Overlay.BottomSheet,
-                                    posters = result.mapNotNull { item ->
-                                        item.videoType?.let { reviewType ->
-                                            Video(
-                                                id = item.id,
-                                                title = item.displayName,
-                                                type = reviewType,
-                                                posterPath = item.posterPath
-                                                    ?.takeIf(String::isNotEmpty)
-                                                    ?.let { path -> "$TMDB_IMAGE_BASE_URL$path" })
-                                        }
-                                    }
+        when (val result = searchVideoUseCase(_uiState.value.title)) {
+            is SearchVideoResult.Success -> {
+                if (result.videos.size == 1) {
+                    val video = result.videos.first()
+                    loadVideoDetail(video.type, video.id)
+                } else {
+                    _uiState.update {
+                        it.copy(
+                            overlay = Overlay.BottomSheet,
+                            posters = result.videos.map { video ->
+                                Video(
+                                    id = video.id,
+                                    title = video.title,
+                                    type = video.type,
+                                    posterPath = video.posterPath,
                                 )
                             }
-                        }
-                    }
-                }.onFailure { e ->
-                    // todo snack bar network error
-                    e.message?.let { msg -> Log.e("search", msg) }
-                }
-        }
-    }
-
-    private fun getMovieDetail(movieId: Int) {
-        viewModelScope.launch {
-            mediaRepository.getDetailMovie(movieId)
-                .onSuccess { result ->
-                    _uiState.update {
-                        it.copy(
-                            overlay = Overlay.None,
-                            title = result.title,
-                            type = ReviewType.MOVIE,
-                            creatorName = result.credits.crew
-                                .filter { it.job == "Director" }
-                                .joinToString(", ") { it.name },
-                            images = result.posterPath
-                                ?.let {
-                                    listOf(
-                                        ImageItem(
-                                            uri = "$TMDB_IMAGE_BASE_URL${result.posterPath}".toUri()
-                                        )
-                                    )
-                                }
-                                ?: emptyList(),
-                            tags = result.genres.map { it.name }
                         )
                     }
                 }
-                .onFailure {
-                    // todo network error
-                }
+            }
+
+            is SearchVideoResult.EmptyQuery -> _uiState.update {
+                it.copy(
+                    overlay = Overlay.None,
+                    userMessage = "제목을 입력해 주세요."
+                )
+            }
+
+            is SearchVideoResult.EmptyResult -> _uiState.update {
+                it.copy(
+                    overlay = Overlay.None,
+                    userMessage = "검색 결과가 없습니다."
+                )
+            }
+
+            is SearchVideoResult.Error -> _uiState.update {
+                it.copy(
+                    overlay = Overlay.None,
+                    userMessage = "네트워크가 불안정 합니다."
+                )
+            }
         }
     }
 
-    private fun getTvSeriesDetail(seriesId: Int) {
-        viewModelScope.launch {
-            mediaRepository.getDetailTvSeries(seriesId)
-                .onSuccess { result ->
-                    _uiState.update {
-                        it.copy(
-                            overlay = Overlay.None,
-                            title = result.name,
-                            type = ReviewType.TV_SERIES,
-                            creatorName = result.createdBy.joinToString(", ") { it.name },
-                            images = result.posterPath
-                                ?.let {
-                                    listOf(
-                                        ImageItem(
-                                            uri = "$TMDB_IMAGE_BASE_URL${result.posterPath}".toUri()
-                                        )
-                                    )
-                                }
-                                ?: emptyList(),
-                            tags = result.genres.map { it.name }
-                        )
-                    }
+    private fun loadVideoDetail(type: ReviewType, mediaId: Int) = viewModelScope.launch {
+        _uiState.update { it.copy(overlay = Overlay.Progress) }
+        val result = when (type) {
+            ReviewType.MOVIE -> getMovieDetailUseCase(mediaId)
+            ReviewType.TV_SERIES -> getTvSeriesDetailUseCase(mediaId)
+            ReviewType.BOOK -> return@launch
+        }
+        when (result) {
+            is VideoDetailResult.Success -> {
+                val video = result.video
+                _uiState.update {
+                    it.copy(
+                        overlay = Overlay.None,
+                        title = video.title,
+                        type = video.type,
+                        creatorName = video.creator,
+                        images = listOf(ImageItem(uri = video.posterPath.toUri())),
+                    )
                 }
-                .onFailure {
-                    // todo network error
+            }
+            VideoDetailResult.Error -> {
+                _uiState.update {
+                    it.copy(overlay = Overlay.None, userMessage = "네트워크가 불안정 합니다.")
                 }
+            }
         }
     }
-
 
     private fun searchBooks() {
         // todo kakao api

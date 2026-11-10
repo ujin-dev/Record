@@ -9,7 +9,5 @@ enum class TmdbMediaType {
     MOVIE,
 
     @SerialName("tv")
-    TV,
-
-    UNKNOWN
+    TV
 }
