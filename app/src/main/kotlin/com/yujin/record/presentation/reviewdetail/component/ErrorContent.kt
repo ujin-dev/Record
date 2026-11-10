@@ -29,7 +29,7 @@ fun ErrorContent() {
         )
         Spacer(modifier = Modifier.size(16.dp))
         Text(
-            text = "Not Found Review",
+            text = "리뷰 조회를 실패했습니다.",
             style = MaterialTheme.typography.titleLarge,
         )
     }

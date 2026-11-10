@@ -10,17 +10,27 @@ import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Instant
 
 @OptIn(FormatStringsInDatetimeFormats::class)
-private val fullPattern = LocalDateTime.Format {
-    byUnicodePattern("yyyy.MM.dd HH:mm")
-}
-
 fun Instant.toDisplayString(): String =
     toLocalDateTime(TimeZone.currentSystemDefault())
-        .format(fullPattern)
+        .format(LocalDateTime.Format {
+            byUnicodePattern("yyyy.MM.dd HH:mm")
+        })
 
 @OptIn(FormatStringsInDatetimeFormats::class)
-private val simplePattern = LocalDate.Format {
-    byUnicodePattern("yy.MM.dd")
-}
+fun Instant.toYearString(): String =
+    toLocalDateTime(TimeZone.currentSystemDefault())
+        .format(LocalDateTime.Format {
+            byUnicodePattern("yyyy")
+        })
 
-fun LocalDate.toDisplayString(): String = format(simplePattern)
+@OptIn(FormatStringsInDatetimeFormats::class)
+fun Instant.toMonthDateString(): String =
+    toLocalDateTime(TimeZone.currentSystemDefault())
+        .format(LocalDateTime.Format {
+            byUnicodePattern("MM.dd")
+        })
+
+@OptIn(FormatStringsInDatetimeFormats::class)
+fun LocalDate.toDisplayString(): String = format(LocalDate.Format {
+    byUnicodePattern("yy.MM.dd")
+})

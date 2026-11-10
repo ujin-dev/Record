@@ -23,6 +23,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import com.yujin.record.ui.theme.Dimens
 
 @Composable
 fun CalendarCell(
@@ -35,7 +36,7 @@ fun CalendarCell(
 ) {
     Box(
         modifier = modifier
-            .clip(shape = RoundedCornerShape(8.dp))
+            .clip(shape = RoundedCornerShape(Dimens.imageCornerSize))
             .clickable(onClick = onClick)
             .background(color = MaterialTheme.colorScheme.surfaceContainer)
     ) {

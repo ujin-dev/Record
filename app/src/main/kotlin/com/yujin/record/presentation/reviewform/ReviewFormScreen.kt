@@ -63,6 +63,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.yujin.record.domain.model.ReviewType
+import com.yujin.record.presentation.MAX_IMAGE_COUNT
 import com.yujin.record.presentation.reviewform.component.FormField
 import com.yujin.record.presentation.reviewform.component.FormSection
 import com.yujin.record.presentation.reviewform.component.RatingBar
@@ -72,8 +73,6 @@ import com.yujin.record.presentation.reviewform.component.SearchResultBottomShee
 import com.yujin.record.presentation.reviewform.component.SelectedImageItem
 import com.yujin.record.ui.theme.Dimens
 import com.yujin.record.presentation.toDisplayString
-
-private const val MAX_IMAGE_COUNT = 3
 
 @Composable
 fun ReviewFormScreen(

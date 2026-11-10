@@ -11,4 +11,5 @@ object Dimens {
 
     val cornerSize = 16.dp
     val cardCornerSize = 12.dp
+    val imageCornerSize = 8.dp
 }

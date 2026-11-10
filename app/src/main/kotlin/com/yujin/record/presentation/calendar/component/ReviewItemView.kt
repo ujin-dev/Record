@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.yujin.record.domain.model.Review
 import com.yujin.record.domain.model.ReviewType
+import com.yujin.record.ui.theme.Dimens
 
 @Composable
 fun ReviewItemView(review: Review, onClick: () -> Unit) {
@@ -46,7 +47,7 @@ fun ReviewItemView(review: Review, onClick: () -> Unit) {
         Box(
             modifier = Modifier
                 .size(56.dp)
-                .clip(RoundedCornerShape(8.dp)),
+                .clip(RoundedCornerShape(Dimens.imageCornerSize)),
             contentAlignment = Alignment.Center,
         ) {
             review.images.firstOrNull()?.let { image ->

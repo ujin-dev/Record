@@ -35,16 +35,18 @@ class ReviewDetailViewModel @Inject constructor(
         loadReview()
     }
 
-    private fun loadReview() = viewModelScope.launch {
+    private fun loadReview() {
         _uiState.value = ReviewDetailScreenState.Loading
+        
+        viewModelScope.launch {
+            when (val result = getReviewByIdUseCase(reviewId)) {
+                is ReviewResult.Success -> {
+                    _uiState.value = ReviewDetailScreenState.Success(result.data.toUiState())
+                }
 
-        when (val result = getReviewByIdUseCase(reviewId)) {
-            is ReviewResult.Success -> {
-                _uiState.value = ReviewDetailScreenState.Success(result.data.toUiState())
-            }
-
-            ReviewResult.Error -> {
-                _uiState.value = ReviewDetailScreenState.NotFound
+                ReviewResult.Error -> {
+                    _uiState.value = ReviewDetailScreenState.NotFound
+                }
             }
         }
     }

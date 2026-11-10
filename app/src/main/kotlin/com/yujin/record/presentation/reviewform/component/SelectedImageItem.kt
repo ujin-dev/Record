@@ -38,7 +38,7 @@ fun SelectedImageItem(
             modifier = Modifier
                 .fillMaxWidth()
                 .aspectRatio(1f)
-                .clip(RoundedCornerShape(Dimens.cornerSize)),
+                .clip(RoundedCornerShape(Dimens.imageCornerSize)),
             contentScale = ContentScale.Crop,
         )
 
