@@ -4,6 +4,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.yujin.record.presentation.reviewdetail.component.ErrorContent
@@ -16,6 +18,7 @@ import com.yujin.record.ui.theme.Dimens
 fun ReviewDetailScreen(
     uiState: ReviewDetailScreenState,
     onAction: (ReviewDetailUiAction) -> Unit,
+    snackbarHostState: SnackbarHostState,
 ) {
     Scaffold(
         topBar = {
@@ -26,6 +29,7 @@ fun ReviewDetailScreen(
                 showActions = uiState is ReviewDetailScreenState.Success,
             )
         },
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) { innerPadding ->
         when (uiState) {
             ReviewDetailScreenState.Loading -> LoadingContent()

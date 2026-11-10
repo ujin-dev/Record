@@ -37,7 +37,7 @@ class ReviewDetailViewModel @Inject constructor(
 
     private fun loadReview() {
         _uiState.value = ReviewDetailScreenState.Loading
-        
+
         viewModelScope.launch {
             when (val result = getReviewByIdUseCase(reviewId)) {
                 is ReviewResult.Success -> {
@@ -71,7 +71,7 @@ class ReviewDetailViewModel @Inject constructor(
         when (deleteReviewUseCase(reviewId)) {
             is ReviewResult.Success -> _uiEvent.emit(ReviewDetailUiEvent.NavigateToHome)
             ReviewResult.Error -> {
-                // todo: show toast
+                _uiEvent.emit(ReviewDetailUiEvent.ShowSnackbar("삭제에 실패했습니다."))
             }
         }
     }

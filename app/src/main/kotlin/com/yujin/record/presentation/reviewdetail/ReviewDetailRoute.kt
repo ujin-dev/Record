@@ -1,8 +1,10 @@
 package com.yujin.record.presentation.reviewdetail
 
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
@@ -11,6 +13,7 @@ fun ReviewDetailRoute(
     onEditClick: (Long) -> Unit,
     onBackClick: () -> Unit,
     onDelete: () -> Unit,
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     viewModel: ReviewDetailViewModel = hiltViewModel(),
 ) {
     LaunchedEffect(Unit) {
@@ -19,6 +22,7 @@ fun ReviewDetailRoute(
                 ReviewDetailUiEvent.NavigateToBack -> onBackClick()
                 ReviewDetailUiEvent.NavigateToHome -> onDelete()
                 is ReviewDetailUiEvent.NavigateToForm -> onEditClick(event.id)
+                is ReviewDetailUiEvent.ShowSnackbar -> snackbarHostState.showSnackbar(event.message)
             }
         }
     }
@@ -27,6 +31,7 @@ fun ReviewDetailRoute(
 
     ReviewDetailScreen(
         uiState = uiState,
-        onAction = viewModel::onAction
+        onAction = viewModel::onAction,
+        snackbarHostState = snackbarHostState
     )
 }
