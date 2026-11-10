@@ -31,102 +31,101 @@ class ReviewRepositoryImpl @Inject constructor(
     private val imageStorage: ImageStorage,
 ) : ReviewRepository {
 
-    override suspend fun insertReview(review: Review): Result<Long> =
-        runCatching {
-            val backupUris = mutableListOf<Uri>()
+    override suspend fun insertReview(review: Review): Long {
+        val backupUris = mutableListOf<Uri>()
 
-            try {
-                database.withTransaction {
-                    val reviewId = reviewDao.insert(review.toEntity())
+        try {
+            return database.withTransaction {
+                val reviewId = reviewDao.insert(review.toEntity())
 
-                    val imageEntities = review.images.mapIndexed { index, item ->
-                        val backupUri = imageStorage.backupImage(item.uri)
-                            .also(backupUris::add)
-                        item.copy(uri = backupUri).toEntity(reviewId, index + 1)
-                    }
-
-                    imageDao.insertAll(imageEntities)
-
-                    reviewId
+                val imageEntities = review.images.mapIndexed { index, item ->
+                    val backupUri = imageStorage.backupImage(item.uri)
+                        .also(backupUris::add)
+                    item.copy(uri = backupUri).toEntity(reviewId, index + 1)
                 }
-            } catch (e: Exception) {
-                runCatching {
-                    if (backupUris.isNotEmpty()) {
-                        imageStorage.deleteImages(backupUris)
-                    }
-                }.onFailure {
+
+                imageDao.insertAll(imageEntities)
+
+                reviewId
+            }
+        } catch (e: Exception) {
+            if (backupUris.isNotEmpty()) {
+                try {
+                    imageStorage.deleteImages(backupUris)
+                } catch (cleanupException: Exception) {
                     Log.e(
                         "ReviewRepositoryImpl",
-                        "Failed to delete images - $backupUris"
+                        "Failed to delete images - $backupUris",
+                        cleanupException
                     )
                 }
-
-                throw e
             }
+
+            throw e
         }
-
-    override suspend fun updateReview(review: Review): Result<Unit> =
-        runCatching {
-            val backupUris = mutableListOf<Uri>()
-
-            try {
-                database.withTransaction {
-                    reviewDao.update(review.toEntity())
-
-                    val oldImages = imageDao.getByReviewId(review.id)
-
-                    val deleteUris =
-                        if (oldImages.isNotEmpty()) {
-                            oldImages.map { it.uri.toUri() }.toSet() -
-                                    review.images.map { it.uri }.toSet()
-                        } else {
-                            emptySet()
-                        }
-
-                    val imageEntities = review.images.mapIndexed { index, item ->
-                        val backupUri =
-                            if (imageStorage.isBackupImage(item.uri)) {
-                                item.uri
-                            } else {
-                                imageStorage.backupImage(item.uri).also(backupUris::add)
-                            }
-
-                        item.copy(uri = backupUri).toEntity(review.id, index + 1)
-                    }
-
-                    if (oldImages.isNotEmpty()) {
-                        imageDao.deleteAll(oldImages)
-                    }
-                    imageDao.insertAll(imageEntities)
-
-                    if (deleteUris.isNotEmpty()) {
-                        imageStorage.deleteImages(deleteUris.toList())
-                    }
-                }
-            } catch (e: Exception) {
-                if (BuildConfig.DEBUG) {
-                    Log.e("update", "이미지 저장 실패", e)
-                }
-                runCatching {
-                    if (backupUris.isNotEmpty()) {
-                        imageStorage.deleteImages(backupUris)
-                    }
-                }.onFailure {
-                    Log.e(
-                        "ReviewRepositoryImpl",
-                        "Failed to delete images - $backupUris"
-                    )
-                }
-
-                throw e
-            }
-        }
-
-    override suspend fun getReviewById(id: Long): Result<Review> = runCatching {
-        reviewDao.getById(id)?.toReview() ?: throw NoSuchElementException()
     }
 
-    override suspend fun deleteReview(reviewId: Long): Result<Unit> = runCatching {
+    override suspend fun updateReview(review: Review) {
+        val backupUris = mutableListOf<Uri>()
+
+        try {
+            database.withTransaction {
+                reviewDao.update(review.toEntity())
+
+                val oldImages = imageDao.getByReviewId(review.id)
+
+                val deleteUris =
+                    if (oldImages.isNotEmpty()) {
+                        oldImages.map { it.uri.toUri() }.toSet() -
+                                review.images.map { it.uri }.toSet()
+                    } else {
+                        emptySet()
+                    }
+
+                val imageEntities = review.images.mapIndexed { index, item ->
+                    val backupUri =
+                        if (imageStorage.isBackupImage(item.uri)) {
+                            item.uri
+                        } else {
+                            imageStorage.backupImage(item.uri).also(backupUris::add)
+                        }
+
+                    item.copy(uri = backupUri).toEntity(review.id, index + 1)
+                }
+
+                if (oldImages.isNotEmpty()) {
+                    imageDao.deleteAll(oldImages)
+                }
+                imageDao.insertAll(imageEntities)
+
+                if (deleteUris.isNotEmpty()) {
+                    imageStorage.deleteImages(deleteUris.toList())
+                }
+            }
+        } catch (e: Exception) {
+            if (BuildConfig.DEBUG) {
+                Log.e("ReviewRepositoryImpl", "Failed to update review", e)
+            }
+            if (backupUris.isNotEmpty()) {
+                try {
+                    imageStorage.deleteImages(backupUris)
+                } catch (cleanupException: Exception) {
+                    Log.e(
+                        "ReviewRepositoryImpl",
+                        "Failed to delete images - $backupUris",
+                        cleanupException
+                    )
+                }
+            }
+
+            throw e
+        }
+    }
+
+    override suspend fun getReviewById(id: Long): Review =
+        reviewDao.getById(id)?.toReview() ?: throw NoSuchElementException()
+
+    override suspend fun deleteReview(reviewId: Long) {
         database.withTransaction {
             val images = imageDao.getByReviewId(reviewId)
             if (images.isNotEmpty()) {

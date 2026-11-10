@@ -4,8 +4,10 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
+import com.yujin.record.domain.usecase.DeleteReviewUseCase
+import com.yujin.record.domain.usecase.GetReviewByIdUseCase
+import com.yujin.record.domain.usecase.ReviewResult
 import com.yujin.record.navigation.RecordRoute
-import com.yujin.record.domain.repository.ReviewRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,7 +19,8 @@ import javax.inject.Inject
 @HiltViewModel
 class ReviewDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    private val reviewRepository: ReviewRepository,
+    private val getReviewByIdUseCase: GetReviewByIdUseCase,
+    private val deleteReviewUseCase: DeleteReviewUseCase,
 ) : ViewModel() {
     private val reviewId: Long = savedStateHandle.toRoute<RecordRoute.ReviewDetail>().reviewId
 
@@ -35,11 +38,15 @@ class ReviewDetailViewModel @Inject constructor(
     private fun loadReview() = viewModelScope.launch {
         _uiState.value = ReviewDetailScreenState.Loading
 
-        val result = reviewRepository.getReviewById(reviewId)
-        _uiState.value = result.fold(
-            onSuccess = { review -> ReviewDetailScreenState.Success(review.toUiState()) },
-            onFailure = { ReviewDetailScreenState.NotFound }
-        )
+        when (val result = getReviewByIdUseCase(reviewId)) {
+            is ReviewResult.Success -> {
+                _uiState.value = ReviewDetailScreenState.Success(result.data.toUiState())
+            }
+
+            ReviewResult.Error -> {
+                _uiState.value = ReviewDetailScreenState.NotFound
+            }
+        }
     }
 
     fun onAction(action: ReviewDetailUiAction) {
@@ -59,11 +66,11 @@ class ReviewDetailViewModel @Inject constructor(
     }
 
     private fun deleteReview() = viewModelScope.launch {
-        reviewRepository.deleteReview(reviewId)
-            .onSuccess {
-                _uiEvent.emit(ReviewDetailUiEvent.NavigateToHome)
-            }.onFailure {
+        when (deleteReviewUseCase(reviewId)) {
+            is ReviewResult.Success -> _uiEvent.emit(ReviewDetailUiEvent.NavigateToHome)
+            ReviewResult.Error -> {
                 // todo: show toast
             }
+        }
     }
 }

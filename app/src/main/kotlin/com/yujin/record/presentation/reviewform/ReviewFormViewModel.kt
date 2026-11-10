@@ -9,11 +9,14 @@ import androidx.navigation.toRoute
 import com.yujin.record.domain.model.ImageItem
 import com.yujin.record.domain.model.ReviewType
 import com.yujin.record.domain.model.Video
-import com.yujin.record.domain.repository.ReviewRepository
 import com.yujin.record.domain.usecase.GetMovieDetailUseCase
+import com.yujin.record.domain.usecase.GetReviewByIdUseCase
 import com.yujin.record.domain.usecase.GetTvSeriesDetailUseCase
+import com.yujin.record.domain.usecase.InsertReviewUseCase
+import com.yujin.record.domain.usecase.ReviewResult
 import com.yujin.record.domain.usecase.SearchVideoResult
 import com.yujin.record.domain.usecase.SearchVideoUseCase
+import com.yujin.record.domain.usecase.UpdateReviewUseCase
 import com.yujin.record.domain.usecase.VideoDetailResult
 import com.yujin.record.navigation.RecordRoute
 import com.yujin.record.presentation.calendar.toInstant
@@ -32,7 +35,9 @@ import javax.inject.Inject
 @HiltViewModel
 class ReviewFormViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    private val reviewRepository: ReviewRepository,
+    private val getReviewByIdUseCase: GetReviewByIdUseCase,
+    private val insertReviewUseCase: InsertReviewUseCase,
+    private val updateReviewUseCase: UpdateReviewUseCase,
     private val searchVideoUseCase: SearchVideoUseCase,
     private val getMovieDetailUseCase: GetMovieDetailUseCase,
     private val getTvSeriesDetailUseCase: GetTvSeriesDetailUseCase,
@@ -60,14 +65,14 @@ class ReviewFormViewModel @Inject constructor(
     }
 
     private fun loadReview(reviewId: Long) = viewModelScope.launch {
-        reviewRepository.getReviewById(reviewId)
-            .onSuccess { review ->
-                _uiState.update { review.toUiState() }
-            }.onFailure {
+        when (val result = getReviewByIdUseCase(reviewId)) {
+            is ReviewResult.Success -> _uiState.update { result.data.toUiState() }
+            ReviewResult.Error -> {
                 _uiState.update {
                     it.copy(userMessage = "리뷰를 불러오는데 실패했습니다.")
                 }
             }
+        }
     }
 
     fun onAction(action: ReviewFormUiAction) {
@@ -112,16 +117,16 @@ class ReviewFormViewModel @Inject constructor(
             viewModelScope.launch {
                 val review = _uiState.value.toReview()
                 val result = if (review.id == 0L) {
-                    reviewRepository.insertReview(review)
+                    insertReviewUseCase(review)
                 } else {
-                    reviewRepository.updateReview(review).map { review.id }
+                    updateReviewUseCase(review)
                 }
-
-                result
-                    .onSuccess { id ->
-                        _uiEvent.emit(ReviewFormUiEvent.NavigateToDetail(id))
+                when (result) {
+                    is ReviewResult.Success -> {
+                        val reviewId = result.data
+                        _uiEvent.emit(ReviewFormUiEvent.NavigateToDetail(reviewId))
                     }
-                    .onFailure {
+                    ReviewResult.Error -> {
                         _uiState.update {
                             it.copy(
                                 overlay = Overlay.None,
@@ -129,6 +134,7 @@ class ReviewFormViewModel @Inject constructor(
                             )
                         }
                     }
+                }
             }
         }
     }

@@ -14,7 +14,7 @@ fun MediaDto.toVideo(): Video? {
     return Video(
         id = id,
         title = title ?: name ?: "",
-        posterPath = if (posterPath.isNullOrEmpty()) null else "$TMDB_IMAGE_BASE_URL$posterPath",
+        posterPath = if (posterPath.isNullOrEmpty()) "" else "$TMDB_IMAGE_BASE_URL$posterPath",
         type = type,
     )
 }
@@ -22,7 +22,7 @@ fun MediaDto.toVideo(): Video? {
 fun MovieDetailResponse.toVideo() = Video(
     id = id,
     title = title,
-    posterPath = if (posterPath.isNullOrEmpty()) null else "$TMDB_IMAGE_BASE_URL$posterPath",
+    posterPath = if (posterPath.isNullOrEmpty()) "" else "$TMDB_IMAGE_BASE_URL$posterPath",
     type = ReviewType.MOVIE,
     creator = credits.crew
         .filter { it.job == "Director" }
@@ -32,7 +32,7 @@ fun MovieDetailResponse.toVideo() = Video(
 fun TvSeriesDetailResponse.toVideo() = Video(
     id = id,
     title = name,
-    posterPath = if (posterPath.isNullOrEmpty()) null else "$TMDB_IMAGE_BASE_URL$posterPath",
+    posterPath = if (posterPath.isNullOrEmpty()) "" else "$TMDB_IMAGE_BASE_URL$posterPath",
     type = ReviewType.TV_SERIES,
     creator = createdBy.joinToString(", ") { it.name },
 )
