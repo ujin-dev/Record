@@ -6,20 +6,18 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
+import com.yujin.record.R
 import com.yujin.record.domain.model.ReviewImage
 import com.yujin.record.domain.model.ReviewType
 import com.yujin.record.domain.model.Video
-import com.yujin.record.domain.usecase.GetMovieDetailUseCase
 import com.yujin.record.domain.usecase.GetReviewByIdUseCase
-import com.yujin.record.domain.usecase.GetTvSeriesDetailUseCase
-import com.yujin.record.domain.usecase.InsertReviewUseCase
+import com.yujin.record.domain.usecase.GetVideoDetailUseCase
 import com.yujin.record.domain.usecase.ReviewResult
+import com.yujin.record.domain.usecase.SaveReviewUseCase
 import com.yujin.record.domain.usecase.SearchVideoResult
 import com.yujin.record.domain.usecase.SearchVideoUseCase
-import com.yujin.record.domain.usecase.UpdateReviewUseCase
 import com.yujin.record.domain.usecase.VideoDetailResult
 import com.yujin.record.navigation.RecordRoute
-import com.yujin.record.R
 import com.yujin.record.presentation.calendar.toInstant
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -37,11 +35,9 @@ import javax.inject.Inject
 class ReviewFormViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val getReviewByIdUseCase: GetReviewByIdUseCase,
-    private val insertReviewUseCase: InsertReviewUseCase,
-    private val updateReviewUseCase: UpdateReviewUseCase,
+    private val saveReviewUseCase: SaveReviewUseCase,
     private val searchVideoUseCase: SearchVideoUseCase,
-    private val getMovieDetailUseCase: GetMovieDetailUseCase,
-    private val getTvSeriesDetailUseCase: GetTvSeriesDetailUseCase,
+    private val getVideoDetailUseCase: GetVideoDetailUseCase,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(ReviewFormUiState())
     val uiState: StateFlow<ReviewFormUiState> = _uiState.asStateFlow()
@@ -117,16 +113,12 @@ class ReviewFormViewModel @Inject constructor(
 
             viewModelScope.launch {
                 val review = _uiState.value.toReview()
-                val result = if (review.id == 0L) {
-                    insertReviewUseCase(review)
-                } else {
-                    updateReviewUseCase(review)
-                }
-                when (result) {
+                when (val result = saveReviewUseCase(review)) {
                     is ReviewResult.Success -> {
                         val reviewId = result.data
                         _uiEvent.emit(ReviewFormUiEvent.NavigateToDetail(reviewId))
                     }
+
                     ReviewResult.Error -> {
                         _uiState.update {
                             it.copy(
@@ -197,12 +189,8 @@ class ReviewFormViewModel @Inject constructor(
 
     private fun loadVideoDetail(type: ReviewType, mediaId: Int) = viewModelScope.launch {
         _uiState.update { it.copy(overlay = Overlay.Progress) }
-        val result = when (type) {
-            ReviewType.MOVIE -> getMovieDetailUseCase(mediaId)
-            ReviewType.TV_SERIES -> getTvSeriesDetailUseCase(mediaId)
-            ReviewType.BOOK -> return@launch
-        }
-        when (result) {
+        if (type == ReviewType.BOOK) return@launch
+        when (val result = getVideoDetailUseCase(type, mediaId)) {
             is VideoDetailResult.Success -> {
                 val video = result.video
                 _uiState.update {
@@ -215,6 +203,7 @@ class ReviewFormViewModel @Inject constructor(
                     )
                 }
             }
+
             VideoDetailResult.Error -> {
                 _uiState.update {
                     it.copy(overlay = Overlay.None, userMessage = R.string.msg_network_unstable)
