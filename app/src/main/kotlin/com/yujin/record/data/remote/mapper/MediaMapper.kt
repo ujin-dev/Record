@@ -6,6 +6,7 @@ import com.yujin.record.data.remote.dto.TvSeriesDetailResponse
 import com.yujin.record.domain.model.ReviewType
 import com.yujin.record.domain.model.Video
 
+// todo tmdb image config api
 private const val TMDB_IMAGE_BASE_URL = "https://image.tmdb.org/t/p/original"
 
 fun MediaDto.toVideo(): Video? {

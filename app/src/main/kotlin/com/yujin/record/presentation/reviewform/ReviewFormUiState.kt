@@ -1,6 +1,6 @@
 package com.yujin.record.presentation.reviewform
 
-import com.yujin.record.domain.model.ImageItem
+import com.yujin.record.domain.model.ReviewImage
 import com.yujin.record.domain.model.Video
 import com.yujin.record.domain.model.Review
 import com.yujin.record.domain.model.ReviewType
@@ -9,7 +9,7 @@ import kotlin.time.Instant
 
 data class ReviewFormUiState(
     val overlay: Overlay = Overlay.None,
-    val userMessage: String? = null,
+    val userMessage: Int? = null,
 
     val id: Long = 0,
     val title: String = "",
@@ -17,7 +17,7 @@ data class ReviewFormUiState(
     val type: ReviewType = ReviewType.MOVIE,
     val creatorName: String = "",
     val rating: Float = 3f,
-    val images: List<ImageItem> = emptyList(),
+    val images: List<ReviewImage> = emptyList(),
     val tags: List<String> = emptyList(),
     val tagInput: String = "",
     val selectedBookmarkId: Long = 0,

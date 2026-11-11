@@ -32,14 +32,16 @@ import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.yujin.record.R
 import com.yujin.record.presentation.calendar.component.CalendarPager
 import com.yujin.record.presentation.calendar.component.EmptyReviewRow
 import com.yujin.record.presentation.calendar.component.ReviewItemView
 import com.yujin.record.presentation.calendar.component.WeekDayRow
-import com.yujin.record.ui.theme.Dimens
 import com.yujin.record.presentation.toDisplayString
+import com.yujin.record.ui.theme.Dimens
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -73,7 +75,7 @@ fun CalendarScreen(
                 ) {
                     Icon(
                         imageVector = Icons.Outlined.Today,
-                        contentDescription = "오늘로 이동",
+                        contentDescription = stringResource(R.string.content_desc_go_to_today),
                         modifier = Modifier.size(24.dp)
                     )
                 }
@@ -140,7 +142,10 @@ fun CalendarScreen(
                 shape = RoundedCornerShape(16.dp),
             ) {
                 Text(
-                    text = "${uiState.selectedDate.toDisplayString()} 리뷰 작성",
+                    text = stringResource(
+                        R.string.btn_create_review_for_date,
+                        uiState.selectedDate.toDisplayString()
+                    ),
                     style = MaterialTheme.typography.titleMedium
                 )
             }

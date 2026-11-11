@@ -1,3 +1,77 @@
 <resources>
     <string name="app_name">Re:cord</string>
+
+    <string name="label_review_type_movie">영화</string>
+    <string name="label_review_type_tv_series">TV 시리즈</string>
+    <string name="label_review_type_book">책</string>
+
+    <string-array name="weekday_labels">
+        <item>S</item>
+        <item>M</item>
+        <item>T</item>
+        <item>W</item>
+        <item>T</item>
+        <item>F</item>
+        <item>S</item>
+    </string-array>
+
+    <string name="title_review_create">리뷰 작성</string>
+    <string name="title_review_edit">리뷰 수정</string>
+
+    <string name="btn_review_save">리뷰 저장</string>
+    <string name="btn_review_edit_complete">수정 완료</string>
+
+    <string name="review_form_title_content_type">무엇을 기록할까요?</string>
+    <string name="review_form_desc_content_type">콘텐츠 종류를 선택하세요</string>
+
+    <string name="review_form_label_title">제목</string>
+    <string name="review_form_placeholder_title">작품명을 입력하세요</string>
+    <string name="content_desc_search">검색</string>
+
+    <string name="review_form_label_creator">제작자</string>
+    <string name="review_form_label_author">저자</string>
+    <string name="review_form_placeholder_creator">이름을 입력하세요</string>
+
+    <string name="review_form_title_impression">감상</string>
+    <string name="review_form_desc_impression">별점과 기억하고 싶은 장면을 남겨보세요</string>
+    <string name="review_form_placeholder_content">어떤 생각이 들었나요?</string>
+
+    <string name="review_form_title_photos">사진</string>
+    <string name="review_form_desc_photo_count">최대 %1$d장까지 추가할 수 있어요</string>
+    <string name="btn_add_photo">사진 추가</string>
+
+    <string name="review_form_title_tags">태그</string>
+    <string name="review_form_desc_tags">나중에 쉽게 찾아볼 수 있도록 분류해요</string>
+    <string name="review_form_placeholder_tag">태그를 쉼표나 공백으로 구분해 입력하세요</string>
+    <string name="content_desc_add_tag">태그 추가</string>
+    <string name="content_desc_tag_remove">%1$s 삭제</string>
+
+    <string name="msg_review_load_failed">리뷰를 불러오는데 실패했습니다.</string>
+    <string name="msg_title_required">제목을 입력해 주세요.</string>
+    <string name="msg_review_save_failed">저장에 실패했습니다.</string>
+    <string name="msg_search_empty">검색 결과가 없습니다.</string>
+    <string name="msg_network_unstable">네트워크가 불안정 합니다.</string>
+    <string name="msg_review_delete_failed">삭제에 실패했습니다.</string>
+
+    <string name="error_review_load_failed_short">리뷰 조회를 실패했습니다.</string>
+    <string name="bottomsheet_label_select_movie">영화를 선택해 주세요.</string>
+
+    <string name="content_desc_navigate_back">뒤로가기</string>
+    <string name="content_desc_edit">수정하기</string>
+    <string name="content_desc_delete">삭제하기</string>
+    <string name="content_desc_go_to_today">오늘로 이동</string>
+
+    <string name="bottomsheet_label_empty_review">이 달의 리뷰를 작성해 보세요.</string>
+    <string name="btn_create_review_for_date">%1$s 리뷰 작성</string>
+
+    <string name="content_desc_empty_review_icon">빈 리뷰</string>
+    <string name="content_desc_thumbnail">썸네일</string>
+    <string name="content_desc_review_type">리뷰 종류</string>
+    <string name="content_desc_image_error">이미지 오류</string>
+    <string name="content_desc_remove_image">이미지 삭제</string>
+
+    <string name="exception_image_download_failed">이미지 다운로드 실패: HTTP %1$d</string>
+    <string name="exception_image_input_stream_unavailable">이미지 입력 스트림을 열 수 없습니다: %1$s</string>
+    <string name="exception_image_file_unreadable">이미지 파일을 읽을 수 없습니다.</string>
+    <string name="exception_image_decode_failed">이미지 디코딩에 실패했습니다.</string>
 </resources>

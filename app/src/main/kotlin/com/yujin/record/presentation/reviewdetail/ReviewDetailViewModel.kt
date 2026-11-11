@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
+import com.yujin.record.R
 import com.yujin.record.domain.usecase.DeleteReviewUseCase
 import com.yujin.record.domain.usecase.GetReviewByIdUseCase
 import com.yujin.record.domain.usecase.ReviewResult
@@ -71,7 +72,7 @@ class ReviewDetailViewModel @Inject constructor(
         when (deleteReviewUseCase(reviewId)) {
             is ReviewResult.Success -> _uiEvent.emit(ReviewDetailUiEvent.NavigateToHome)
             ReviewResult.Error -> {
-                _uiEvent.emit(ReviewDetailUiEvent.ShowSnackbar("삭제에 실패했습니다."))
+                _uiEvent.emit(ReviewDetailUiEvent.ShowSnackbar(R.string.msg_review_delete_failed))
             }
         }
     }

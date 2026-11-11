@@ -1,6 +1,6 @@
 package com.yujin.record.presentation.reviewdetail
 
-import com.yujin.record.domain.model.ImageItem
+import com.yujin.record.domain.model.ReviewImage
 import com.yujin.record.domain.model.Review
 import com.yujin.record.domain.model.ReviewType
 import kotlin.time.Clock
@@ -13,7 +13,7 @@ data class ReviewDetailUiState(
     val type: ReviewType = ReviewType.MOVIE,
     val creatorName: String = "",
     val rating: Float = 3f,
-    val images: List<ImageItem> = emptyList(),
+    val images: List<ReviewImage> = emptyList(),
     val tags: List<String> = emptyList(),
     val selectedBookmarkId: Long = 0,
     val createdAt: Instant = Clock.System.now(),

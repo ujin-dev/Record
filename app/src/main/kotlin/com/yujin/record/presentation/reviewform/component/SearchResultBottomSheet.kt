@@ -19,6 +19,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
+import com.yujin.record.R
 import com.yujin.record.domain.model.Video
 import com.yujin.record.domain.model.ReviewType
 import com.yujin.record.ui.theme.Dimens
@@ -46,7 +48,7 @@ fun SearchResultBottomSheet(
                 .padding(bottom = Dimens.bottomSheetPadding)
         ) {
             Text(
-                text = "영화를 선택해 주세요.",
+                text = stringResource(R.string.bottomsheet_label_select_movie),
                 style = MaterialTheme.typography.headlineSmall,
                 modifier = Modifier.padding(start = Dimens.bottomSheetPadding)
             )

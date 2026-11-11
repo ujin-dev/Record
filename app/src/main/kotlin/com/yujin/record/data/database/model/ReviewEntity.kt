@@ -4,10 +4,8 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.yujin.record.domain.model.ReviewType
-import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
-@OptIn(ExperimentalTime::class)
 @Entity(tableName = "reviews")
 data class ReviewEntity(
     @PrimaryKey(autoGenerate = true)

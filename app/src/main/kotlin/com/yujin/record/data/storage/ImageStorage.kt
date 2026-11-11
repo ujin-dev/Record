@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import androidx.core.net.toUri
+import com.yujin.record.R
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -42,7 +43,12 @@ class ImageStorage @Inject constructor(
 
                 if (connection.responseCode !in 200..299) {
                     connection.disconnect()
-                    throw IOException("이미지 다운로드 실패: HTTP ${connection.responseCode}")
+                    throw IOException(
+                        context.getString(
+                            R.string.exception_image_download_failed,
+                            connection.responseCode
+                        )
+                    )
                 }
 
                 connection.inputStream
@@ -54,7 +60,9 @@ class ImageStorage @Inject constructor(
         }
 
         try {
-            requireNotNull(inputStream) { "이미지 입력 스트림을 열 수 없습니다: $sourceUri" }
+            requireNotNull(inputStream) {
+                context.getString(R.string.exception_image_input_stream_unavailable, sourceUri)
+            }
                 .use { input ->
                     tempFile.outputStream().use { output -> input.copyTo(output) }
                 }
@@ -87,7 +95,7 @@ class ImageStorage @Inject constructor(
         input.inputStream().use { BitmapFactory.decodeStream(it, null, bounds) }
 
         require(bounds.outWidth > 0 && bounds.outHeight > 0) {
-            "이미지 파일을 읽을 수 없습니다."
+            context.getString(R.string.exception_image_file_unreadable)
         }
 
         val maxWidth = 600
@@ -96,7 +104,7 @@ class ImageStorage @Inject constructor(
         val bitmap = BitmapFactory.Options().run {
             inSampleSize = sampleSize
             input.inputStream().use { BitmapFactory.decodeStream(it, null, this) }
-        } ?: throw IOException("이미지 디코딩에 실패했습니다.")
+        } ?: throw IOException(context.getString(R.string.exception_image_decode_failed))
 
         try {
             FileOutputStream(targetFile).use { output ->

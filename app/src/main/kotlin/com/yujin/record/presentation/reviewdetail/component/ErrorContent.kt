@@ -14,6 +14,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
+import com.yujin.record.R
 
 @Composable
 fun ErrorContent() {
@@ -24,12 +26,12 @@ fun ErrorContent() {
     ) {
         Icon(
             imageVector = Icons.Default.ErrorOutline,
-            contentDescription = "error",
+            contentDescription = stringResource(R.string.content_desc_image_error),
             modifier = Modifier.size(64.dp),
         )
         Spacer(modifier = Modifier.size(16.dp))
         Text(
-            text = "리뷰 조회를 실패했습니다.",
+            text = stringResource(R.string.error_review_load_failed_short),
             style = MaterialTheme.typography.titleLarge,
         )
     }

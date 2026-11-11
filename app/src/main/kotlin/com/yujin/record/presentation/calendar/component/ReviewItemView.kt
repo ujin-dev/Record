@@ -28,7 +28,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
 import coil3.compose.AsyncImage
+import com.yujin.record.R
 import com.yujin.record.domain.model.Review
 import com.yujin.record.domain.model.ReviewType
 import com.yujin.record.ui.theme.Dimens
@@ -53,7 +55,7 @@ fun ReviewItemView(review: Review, onClick: () -> Unit) {
             review.images.firstOrNull()?.let { image ->
                 AsyncImage(
                     model = image.uri,
-                    contentDescription = "thumbnail",
+                    contentDescription = stringResource(R.string.content_desc_thumbnail),
                     contentScale = ContentScale.Crop,
                 )
             } ?: run {
@@ -64,7 +66,7 @@ fun ReviewItemView(review: Review, onClick: () -> Unit) {
                 }
                 Icon(
                     imageVector = icon,
-                    contentDescription = "review type",
+                    contentDescription = stringResource(R.string.content_desc_review_type),
                     modifier = Modifier.size(24.dp)
                 )
             }

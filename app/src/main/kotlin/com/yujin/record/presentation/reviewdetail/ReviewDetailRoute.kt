@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
@@ -16,13 +17,18 @@ fun ReviewDetailRoute(
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     viewModel: ReviewDetailViewModel = hiltViewModel(),
 ) {
+    val resources = LocalContext.current.resources
     LaunchedEffect(Unit) {
         viewModel.uiEvent.collect { event ->
             when (event) {
                 ReviewDetailUiEvent.NavigateToBack -> onBackClick()
                 ReviewDetailUiEvent.NavigateToHome -> onDelete()
                 is ReviewDetailUiEvent.NavigateToForm -> onEditClick(event.id)
-                is ReviewDetailUiEvent.ShowSnackbar -> snackbarHostState.showSnackbar(event.message)
+                is ReviewDetailUiEvent.ShowSnackbar -> snackbarHostState.showSnackbar(
+                    resources.getString(
+                        event.messageRes
+                    )
+                )
             }
         }
     }

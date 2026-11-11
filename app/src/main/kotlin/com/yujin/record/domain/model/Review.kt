@@ -11,7 +11,7 @@ data class Review(
     val reviewType: ReviewType,
     val rating: Float,
 
-    val images: List<ImageItem> = emptyList(),
+    val images: List<ReviewImage> = emptyList(),
     val tags: List<String> = emptyList(),
     val bookmarkId: Long = 0,
 

@@ -29,6 +29,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
+import com.yujin.record.presentation.stringRes
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.yujin.record.domain.model.ReviewType
@@ -94,12 +96,12 @@ fun SuccessContent(
                                 ReviewType.TV_SERIES -> Icons.Filled.LiveTv
                                 ReviewType.BOOK -> Icons.AutoMirrored.Filled.MenuBook
                             },
-                        contentDescription = "review type",
+                        contentDescription = stringResource(com.yujin.record.R.string.content_desc_review_type),
                         modifier = Modifier.size(32.dp),
                         tint = MaterialTheme.colorScheme.secondary,
                     )
                     Text(
-                        text = uiState.review.type.displayName,
+                        text = stringResource(uiState.review.type.stringRes),
                         style = MaterialTheme.typography.bodyLarge.copy(
                             color = MaterialTheme.colorScheme.secondary,
                             fontSize = 18.sp,

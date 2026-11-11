@@ -6,7 +6,6 @@ import kotlinx.serialization.json.Json
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
-@OptIn(ExperimentalTime::class)
 class Converters {
     @TypeConverter
     fun fromReviewType(reviewType: ReviewType): String = reviewType.name

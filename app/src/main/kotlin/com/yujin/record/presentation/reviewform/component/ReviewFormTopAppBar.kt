@@ -10,7 +10,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import com.yujin.record.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -36,7 +38,10 @@ fun ReviewFormTopAppBar(
         },
         navigationIcon = {
             IconButton(onClick = backClick) {
-                Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = "뒤로가기")
+                Icon(
+                    Icons.AutoMirrored.Rounded.ArrowBack,
+                    contentDescription = stringResource(R.string.content_desc_navigate_back)
+                )
             }
         },
     )

@@ -11,6 +11,8 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
+import com.yujin.record.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -30,7 +32,7 @@ fun ReviewDetailTopAppBar(
         navigationIcon = {
             TopAppBarIconButton(
                 imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
-                contentDescription = "뒤로가기",
+                contentDescription = stringResource(R.string.content_desc_navigate_back),
                 onClick = backClick
             )
         },
@@ -38,13 +40,13 @@ fun ReviewDetailTopAppBar(
             if (showActions) {
                 TopAppBarIconButton(
                     imageVector = Icons.Default.Edit,
-                    contentDescription = "수정하기",
+                    contentDescription = stringResource(R.string.content_desc_edit),
                     onClick = editClick
                 )
 
                 TopAppBarIconButton(
                     imageVector = Icons.Default.Delete,
-                    contentDescription = "삭제하기",
+                    contentDescription = stringResource(R.string.content_desc_delete),
                     onClick = deleteClick
                 )
             }

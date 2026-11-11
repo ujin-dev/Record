@@ -9,18 +9,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringArrayResource
+import com.yujin.record.R
 
 @Composable
 fun WeekDayRow() {
-    val days = listOf("S", "M", "T", "W", "T", "F", "S")
+    val days = stringArrayResource(R.array.weekday_labels)
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .height(30.dp)
     ) {
-        days.forEach { days ->
+        days.forEach { day ->
             Text(
-                text = days,
+                text = day,
                 modifier = Modifier.weight(1f),
                 color = MaterialTheme.colorScheme.onSurface,
                 textAlign = TextAlign.Center,

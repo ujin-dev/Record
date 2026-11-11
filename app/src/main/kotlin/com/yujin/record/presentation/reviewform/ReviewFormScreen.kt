@@ -59,9 +59,11 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.yujin.record.R
 import com.yujin.record.domain.model.ReviewType
 import com.yujin.record.presentation.MAX_IMAGE_COUNT
 import com.yujin.record.presentation.reviewform.component.FormField
@@ -71,8 +73,9 @@ import com.yujin.record.presentation.reviewform.component.ReviewFormBottomBar
 import com.yujin.record.presentation.reviewform.component.ReviewFormTopAppBar
 import com.yujin.record.presentation.reviewform.component.SearchResultBottomSheet
 import com.yujin.record.presentation.reviewform.component.SelectedImageItem
-import com.yujin.record.ui.theme.Dimens
+import com.yujin.record.presentation.stringRes
 import com.yujin.record.presentation.toDisplayString
+import com.yujin.record.ui.theme.Dimens
 
 @Composable
 fun ReviewFormScreen(
@@ -115,14 +118,14 @@ fun ReviewFormScreen(
     Scaffold(
         topBar = {
             ReviewFormTopAppBar(
-                title = if (uiState.id == 0L) "리뷰 작성" else "리뷰 수정",
+                title = stringResource(if (uiState.id == 0L) R.string.title_review_create else R.string.title_review_edit),
                 description = uiState.createdAt.toDisplayString(),
                 backClick = { onAction(ReviewFormUiAction.BackClicked) }
             )
         },
         bottomBar = {
             ReviewFormBottomBar(
-                text = if (uiState.id == 0L) "리뷰 저장" else "수정 완료",
+                text = stringResource(if (uiState.id == 0L) R.string.btn_review_save else R.string.btn_review_edit_complete),
                 onClick = { onAction(ReviewFormUiAction.SaveClicked) }
             )
         },
@@ -146,7 +149,10 @@ fun ReviewFormScreen(
                 ),
             verticalArrangement = Arrangement.spacedBy(Dimens.cardBetweenPadding),
         ) {
-            FormSection(title = "무엇을 기록할까요?", description = "콘텐츠 종류를 선택하세요") {
+            FormSection(
+                title = stringResource(R.string.review_form_title_content_type),
+                description = stringResource(R.string.review_form_desc_content_type)
+            ) {
                 Row(
                     modifier = Modifier.wrapContentHeight(),
                     horizontalArrangement = Arrangement.spacedBy(4.dp)
@@ -157,7 +163,7 @@ fun ReviewFormScreen(
                             FilterChip(
                                 selected = selected,
                                 onClick = { onAction(ReviewFormUiAction.TypeChanged(type)) },
-                                label = { Text(type.displayName) },
+                                label = { Text(stringResource(type.stringRes)) },
                                 modifier = Modifier.wrapContentHeight(),
                                 leadingIcon = {
                                     Icon(
@@ -193,8 +199,8 @@ fun ReviewFormScreen(
                             )
                         )
                     },
-                    label = "제목",
-                    placeholder = "작품명을 입력하세요",
+                    label = stringResource(R.string.review_form_label_title),
+                    placeholder = stringResource(R.string.review_form_placeholder_title),
                     trailingIcon = {
                         if (uiState.id == 0L && uiState.type in listOf(
                                 ReviewType.MOVIE,
@@ -209,7 +215,7 @@ fun ReviewFormScreen(
                             }) {
                                 Icon(
                                     imageVector = Icons.Outlined.Search,
-                                    contentDescription = "search",
+                                    contentDescription = stringResource(R.string.content_desc_search),
                                     modifier = Modifier.size(24.dp)
                                 )
                             }
@@ -231,13 +237,16 @@ fun ReviewFormScreen(
                             ReviewType.MOVIE,
                             ReviewType.TV_SERIES
                         )
-                    ) "제작자" else "저자",
-                    placeholder = "이름을 입력하세요",
+                    ) stringResource(R.string.review_form_label_creator) else stringResource(R.string.review_form_label_author),
+                    placeholder = stringResource(R.string.review_form_placeholder_creator),
                     imeAction = ImeAction.Next,
                 )
             }
 
-            FormSection(title = "감상", description = "별점과 기억하고 싶은 장면을 남겨보세요") {
+            FormSection(
+                title = stringResource(R.string.review_form_title_impression),
+                description = stringResource(R.string.review_form_desc_impression)
+            ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -269,7 +278,7 @@ fun ReviewFormScreen(
                         .heightIn(min = 48.dp)
                         .bringIntoViewRequester(contentIntoViewRequester)
                         .onFocusChanged { isContentFieldFocused = it.isFocused },
-                    placeholder = { Text("어떤 생각이 들었나요?") },
+                    placeholder = { Text(stringResource(R.string.review_form_placeholder_content)) },
                     shape = RoundedCornerShape(Dimens.cornerSize),
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Text,
@@ -277,7 +286,10 @@ fun ReviewFormScreen(
                 )
             }
 
-            FormSection(title = "사진", description = "최대 ${MAX_IMAGE_COUNT}장까지 추가할 수 있어요") {
+            FormSection(
+                title = stringResource(R.string.review_form_title_photos),
+                description = stringResource(R.string.review_form_desc_photo_count, MAX_IMAGE_COUNT)
+            ) {
                 if (uiState.images.isNotEmpty()) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -312,12 +324,15 @@ fun ReviewFormScreen(
                     ) {
                         Icon(Icons.Filled.AddPhotoAlternate, contentDescription = null)
                         Spacer(Modifier.size(8.dp))
-                        Text("사진 추가")
+                        Text(stringResource(R.string.btn_add_photo))
                     }
                 }
             }
 
-            FormSection(title = "태그", description = "나중에 쉽게 찾아볼 수 있도록 분류해요") {
+            FormSection(
+                title = stringResource(R.string.review_form_title_tags),
+                description = stringResource(R.string.review_form_desc_tags)
+            ) {
                 if (uiState.tags.isNotEmpty()) {
                     FlowRow(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -332,7 +347,10 @@ fun ReviewFormScreen(
                                     trailingIcon = {
                                         Icon(
                                             Icons.Filled.Close,
-                                            contentDescription = "$tag 삭제"
+                                            contentDescription = stringResource(
+                                                R.string.content_desc_tag_remove,
+                                                tag
+                                            )
                                         )
                                     },
                                 )
@@ -347,10 +365,13 @@ fun ReviewFormScreen(
                         .bringIntoViewRequester(tagIntoViewRequester)
                         .onFocusChanged { isTagFieldFocused = it.isFocused }
                         .fillMaxWidth(),
-                    placeholder = { Text("예: SF, 로맨스") },
+                    placeholder = { Text(stringResource(R.string.review_form_placeholder_tag)) },
                     trailingIcon = {
                         IconButton(onClick = { onAction(ReviewFormUiAction.TagAdded(uiState.tagInput)) }) {
-                            Icon(Icons.Filled.Add, contentDescription = "태그 추가")
+                            Icon(
+                                Icons.Filled.Add,
+                                contentDescription = stringResource(R.string.content_desc_add_tag)
+                            )
                         }
                     },
                     singleLine = true,
@@ -373,7 +394,8 @@ fun ReviewFormScreen(
                 )
             }
 
-            uiState.userMessage?.let { userMessage ->
+            uiState.userMessage?.let { userMessageRes ->
+                val userMessage = stringResource(userMessageRes)
                 LaunchedEffect(snackbarHostState, uiState, userMessage) {
                     snackbarHostState.showSnackbar(userMessage)
                     onAction(ReviewFormUiAction.ShownSnackbarMessage)

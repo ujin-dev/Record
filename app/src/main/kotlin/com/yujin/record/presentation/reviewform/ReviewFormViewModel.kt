@@ -6,7 +6,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
-import com.yujin.record.domain.model.ImageItem
+import com.yujin.record.domain.model.ReviewImage
 import com.yujin.record.domain.model.ReviewType
 import com.yujin.record.domain.model.Video
 import com.yujin.record.domain.usecase.GetMovieDetailUseCase
@@ -19,6 +19,7 @@ import com.yujin.record.domain.usecase.SearchVideoUseCase
 import com.yujin.record.domain.usecase.UpdateReviewUseCase
 import com.yujin.record.domain.usecase.VideoDetailResult
 import com.yujin.record.navigation.RecordRoute
+import com.yujin.record.R
 import com.yujin.record.presentation.calendar.toInstant
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -69,7 +70,7 @@ class ReviewFormViewModel @Inject constructor(
             is ReviewResult.Success -> _uiState.update { result.data.toUiState() }
             ReviewResult.Error -> {
                 _uiState.update {
-                    it.copy(userMessage = "리뷰를 불러오는데 실패했습니다.")
+                    it.copy(userMessage = R.string.msg_review_load_failed)
                 }
             }
         }
@@ -110,7 +111,7 @@ class ReviewFormViewModel @Inject constructor(
 
     private fun saveReview() {
         if (_uiState.value.title.isEmpty()) {
-            _uiState.update { it.copy(userMessage = "제목을 입력해 주세요.") }
+            _uiState.update { it.copy(userMessage = R.string.msg_title_required) }
         } else {
             _uiState.update { it.copy(overlay = Overlay.Progress) }
 
@@ -130,7 +131,7 @@ class ReviewFormViewModel @Inject constructor(
                         _uiState.update {
                             it.copy(
                                 overlay = Overlay.None,
-                                userMessage = "저장에 실패했습니다."
+                                userMessage = R.string.msg_review_save_failed
                             )
                         }
                     }
@@ -174,21 +175,21 @@ class ReviewFormViewModel @Inject constructor(
             is SearchVideoResult.EmptyQuery -> _uiState.update {
                 it.copy(
                     overlay = Overlay.None,
-                    userMessage = "제목을 입력해 주세요."
+                    userMessage = R.string.msg_title_required
                 )
             }
 
             is SearchVideoResult.EmptyResult -> _uiState.update {
                 it.copy(
                     overlay = Overlay.None,
-                    userMessage = "검색 결과가 없습니다."
+                    userMessage = R.string.msg_search_empty
                 )
             }
 
             is SearchVideoResult.Error -> _uiState.update {
                 it.copy(
                     overlay = Overlay.None,
-                    userMessage = "네트워크가 불안정 합니다."
+                    userMessage = R.string.msg_network_unstable
                 )
             }
         }
@@ -210,13 +211,13 @@ class ReviewFormViewModel @Inject constructor(
                         title = video.title,
                         type = video.type,
                         creatorName = video.creator,
-                        images = listOf(ImageItem(uri = video.posterPath.toUri())),
+                        images = listOf(ReviewImage(uri = video.posterPath.toUri())),
                     )
                 }
             }
             VideoDetailResult.Error -> {
                 _uiState.update {
-                    it.copy(overlay = Overlay.None, userMessage = "네트워크가 불안정 합니다.")
+                    it.copy(overlay = Overlay.None, userMessage = R.string.msg_network_unstable)
                 }
             }
         }
@@ -290,7 +291,7 @@ class ReviewFormViewModel @Inject constructor(
 
     private fun onImageAdded(images: List<Uri>) {
         _uiState.update {
-            it.copy(images = it.images + images.map { uri -> ImageItem(uri = uri) })
+            it.copy(images = it.images + images.map { uri -> ReviewImage(uri = uri) })
         }
     }
 

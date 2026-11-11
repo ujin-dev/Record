@@ -22,6 +22,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
+import com.yujin.record.R
 import coil3.compose.AsyncImage
 import com.yujin.record.ui.theme.Dimens
 
@@ -56,7 +58,7 @@ fun SelectedImageItem(
             ) {
                 Icon(
                     imageVector = Icons.Default.Close,
-                    contentDescription = "remove icon",
+                    contentDescription = stringResource(R.string.content_desc_remove_image),
                     tint = Color.White,
                     modifier = Modifier.size(20.dp)
                 )
