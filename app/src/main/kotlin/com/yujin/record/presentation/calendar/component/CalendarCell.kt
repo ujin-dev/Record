@@ -6,16 +6,15 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.GenericShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Alignment.Companion.BottomCenter
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -38,7 +37,14 @@ fun CalendarCell(
         modifier = modifier
             .clip(shape = RoundedCornerShape(Dimens.imageCornerSize))
             .clickable(onClick = onClick)
-            .background(color = MaterialTheme.colorScheme.surfaceContainer)
+            .background(
+                color =
+                    if (reviewCount > 0) {
+                        MaterialTheme.colorScheme.secondaryContainer
+                    } else {
+                        MaterialTheme.colorScheme.surfaceContainer
+                    }
+            )
     ) {
         if (thumbnailUri != null) {
             AsyncImage(
@@ -51,7 +57,11 @@ fun CalendarCell(
             Text(
                 text = "$date",
                 modifier = Modifier.align(Center),
-                color = MaterialTheme.colorScheme.onSurface,
+                color = if (reviewCount > 0) {
+                    MaterialTheme.colorScheme.onSecondaryContainer
+                } else {
+                    MaterialTheme.colorScheme.onSurface
+                },
                 fontWeight = FontWeight.ExtraBold,
                 style = MaterialTheme.typography.labelLarge
             )
@@ -60,17 +70,26 @@ fun CalendarCell(
         if (reviewCount > 1) {
             Box(
                 modifier = Modifier
-                    .align(BottomCenter)
-                    .offset(y = (-2).dp)
-                    .size(20.dp)
-                    .background(MaterialTheme.colorScheme.tertiaryContainer, CircleShape),
+                    .align(Alignment.BottomEnd)
+                    .size(width = 30.dp, height = 30.dp)
+                    .clip(GenericShape { size, _ ->
+                        moveTo(0f, size.height)
+                        lineTo(size.width, 0f)
+                        lineTo(size.width, size.height)
+                        close()
+                    })
+                    .background(MaterialTheme.colorScheme.tertiaryContainer),
                 contentAlignment = Center,
                 content = {
                     Text(
                         text = "$reviewCount",
-                        color = MaterialTheme.colorScheme.onTertiaryContainer,
-                        fontWeight = FontWeight.ExtraBold,
-                        style = MaterialTheme.typography.labelSmall,
+                        modifier = Modifier
+                            .align(Alignment.BottomEnd)
+                            .padding(bottom = 2.dp, end = 4.dp),
+                        style = MaterialTheme.typography.bodyLarge.copy(
+                            color = MaterialTheme.colorScheme.onTertiaryContainer,
+                            fontWeight = FontWeight.ExtraBold
+                        ),
                     )
                 }
             )
@@ -86,7 +105,10 @@ fun CalendarCell(
                         color = MaterialTheme.colorScheme.onPrimary,
                         shape = CircleShape
                     )
-                    .background(color = MaterialTheme.colorScheme.primary, shape = CircleShape)
+                    .background(
+                        color = MaterialTheme.colorScheme.primary,
+                        shape = CircleShape
+                    )
                     .align(Alignment.TopEnd)
             )
         }
