@@ -68,7 +68,7 @@ class CalendarViewModel @Inject constructor(
                 CalendarCellUiState(
                     date = date,
                     reviewCount = reviews.size,
-                    thumbnailUrl = reviews.lastOrNull()?.images?.firstOrNull()?.uri
+                    thumbnailUrl = reviews.firstNotNullOfOrNull { review -> review.images.firstOrNull()?.uri }
                 )
             }
 
