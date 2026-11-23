@@ -74,16 +74,23 @@ Windows에서는 다음 명령을 사용합니다.
 ## 프로젝트 구조
 
 ```text
-app/src/main/kotlin/com/yujin/record/
-├── di/             # Hilt 모듈
-├── data/           # 저장소 구현, 이미지 저장, 매퍼
-│   └── remote/     # TMDB API 및 응답 모델
-├── database/       # Room 데이터베이스, DAO, Entity
-├── model/          # 앱 도메인 모델
-├── ui/             # 공통 UI, 테마, 날짜 포맷
-├── calendar/       # 달력과 날짜별 리뷰 목록
-├── reviewform/     # 리뷰 작성 및 수정
-└── reviewdetail/   # 리뷰 상세 화면
+kotlin/com/yujin/record/
+├── data/                 # 데이터 계층
+│   ├── database/         # Room DB, DAO, Entity, 매퍼
+│   ├── remote/           # TMDB API, DTO, 모델, 매퍼
+│   ├── repository/       # Repository 구현
+│   └── storage/          # 이미지 파일 저장
+├── di/                   # Hilt 의존성 모듈
+├── domain/               # 도메인 계층
+│   ├── model/            # 앱 모델
+│   ├── repository/       # Repository 인터페이스
+│   └── usecase/          # 앱 유스케이스
+├── navigation/           # Compose 내비게이션
+├── presentation/         # 화면 및 UI 상태 관리
+│   ├── calendar/         # 달력 화면과 컴포넌트
+│   ├── reviewdetail/     # 리뷰 상세 화면
+│   └── reviewform/       # 리뷰 작성·수정 화면
+└── ui/                   # 공통 미리보기와 테마
 ```
 
 ## 데이터 및 출처
