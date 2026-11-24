@@ -122,7 +122,6 @@ fun CalendarScreen(
                     state = uiState.calendarState,
                     selectedDate = uiState.selectedDate,
                     onAction = onAction,
-                    goToTodayRequestId = uiState.goToTodayRequestId,
                     modifier = Modifier.fillMaxHeight()
                 )
             }

@@ -1,5 +1,6 @@
 package com.yujin.record.presentation.calendar
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.yujin.record.domain.model.Review
@@ -11,6 +12,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
@@ -105,8 +107,7 @@ class CalendarViewModel @Inject constructor(
                 monthlyReviews = emptyList(),
                 calendarState = CalendarContentUiState(
                     displayedYearMonth = today.toYearMonth(),
-                ),
-                goToTodayRequestId = it.goToTodayRequestId + 1
+                )
             )
         }
         currentMonth.value = today.toYearMonth()

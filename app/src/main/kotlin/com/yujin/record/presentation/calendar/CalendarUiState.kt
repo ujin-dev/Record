@@ -9,8 +9,6 @@ data class CalendarUiState(
     val selectedDate: LocalDate,
     val calendarState: CalendarContentUiState,
     val monthlyReviews: List<Review> = emptyList(),
-
-    val goToTodayRequestId: Int = 0
 )
 
 data class CalendarContentUiState(

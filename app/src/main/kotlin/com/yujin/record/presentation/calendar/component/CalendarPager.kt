@@ -15,17 +15,14 @@ import com.yujin.record.presentation.calendar.CalendarUiAction
 import kotlinx.coroutines.flow.map
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.TimeZone
 import kotlinx.datetime.YearMonth
 import kotlinx.datetime.number
 import kotlinx.datetime.plus
-import kotlinx.datetime.todayIn
-import kotlin.time.Clock
 
 private const val RANGE = 1_200 // 100 year
 private const val BASE_PAGE = RANGE / 2 // for infinite swipe
 
-internal fun betweenMonth(start: YearMonth, end: YearMonth) =
+private fun betweenMonth(start: YearMonth, end: YearMonth) =
     (end.year - start.year) * 12 + (end.month.number - start.month.number)
 
 @Composable
@@ -33,7 +30,6 @@ fun CalendarPager(
     state: CalendarContentUiState,
     selectedDate: LocalDate,
     onAction: (CalendarUiAction) -> Unit,
-    goToTodayRequestId: Int,
     modifier: Modifier = Modifier,
 ) {
     val anchorYearMonth = remember { state.displayedYearMonth }
@@ -47,15 +43,6 @@ fun CalendarPager(
         val targetPage = BASE_PAGE + betweenMonth(anchorYearMonth, state.displayedYearMonth)
         if (pagerState.currentPage != targetPage) {
             pagerState.scrollToPage(targetPage)
-        }
-    }
-
-    LaunchedEffect(goToTodayRequestId) {
-        if (goToTodayRequestId > 0) {
-            val today = Clock.System.todayIn(TimeZone.currentSystemDefault())
-            val todayMonth = YearMonth(today.year, today.month)
-            val todayPage = BASE_PAGE + betweenMonth(anchorYearMonth, todayMonth)
-            pagerState.animateScrollToPage(todayPage)
         }
     }
 
