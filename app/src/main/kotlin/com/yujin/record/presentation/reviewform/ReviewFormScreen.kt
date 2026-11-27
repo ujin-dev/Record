@@ -81,7 +81,7 @@ import com.yujin.record.ui.theme.Dimens
 fun ReviewFormScreen(
     uiState: ReviewFormUiState,
     onAction: (ReviewFormUiAction) -> Unit,
-    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
+    snackbarHostState: SnackbarHostState,
 ) {
     val remainingImageCount = MAX_IMAGE_COUNT - uiState.images.size
     val launcher = if (remainingImageCount > 1) {
@@ -392,14 +392,6 @@ fun ReviewFormScreen(
                     },
                     onDismiss = { onAction(ReviewFormUiAction.BottomSheetClosed) }
                 )
-            }
-
-            uiState.userMessage?.let { userMessageRes ->
-                val userMessage = stringResource(userMessageRes)
-                LaunchedEffect(snackbarHostState, uiState, userMessage) {
-                    snackbarHostState.showSnackbar(userMessage)
-                    onAction(ReviewFormUiAction.ShownSnackbarMessage)
-                }
             }
         }
     }

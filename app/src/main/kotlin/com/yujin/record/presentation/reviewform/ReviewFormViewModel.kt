@@ -65,9 +65,7 @@ class ReviewFormViewModel @Inject constructor(
         when (val result = getReviewByIdUseCase(reviewId)) {
             is ReviewResult.Success -> _uiState.update { result.data.toUiState() }
             ReviewResult.Error -> {
-                _uiState.update {
-                    it.copy(userMessage = R.string.msg_review_load_failed)
-                }
+                showSnackbar(R.string.msg_review_load_failed)
             }
         }
     }
@@ -97,7 +95,6 @@ class ReviewFormViewModel @Inject constructor(
             ReviewFormUiAction.SearchClicked -> search()
             ReviewFormUiAction.BottomSheetClosed -> closeBottomSheet()
             ReviewFormUiAction.BookmarkSelectorClicked -> Unit // todo
-            ReviewFormUiAction.ShownSnackbarMessage -> removeSnackbarMessage()
         }
     }
 
@@ -105,28 +102,21 @@ class ReviewFormViewModel @Inject constructor(
         _uiState.update { it.copy(overlay = Overlay.None) }
     }
 
-    private fun saveReview() {
+    private fun saveReview() = viewModelScope.launch {
         if (_uiState.value.title.isEmpty()) {
-            _uiState.update { it.copy(userMessage = R.string.msg_title_required) }
+            showSnackbar(R.string.msg_title_required)
         } else {
             _uiState.update { it.copy(overlay = Overlay.Progress) }
 
-            viewModelScope.launch {
-                val review = _uiState.value.toReview()
-                when (val result = saveReviewUseCase(review)) {
-                    is ReviewResult.Success -> {
-                        val reviewId = result.data
-                        _uiEvent.emit(ReviewFormUiEvent.NavigateToDetail(reviewId))
-                    }
+            val review = _uiState.value.toReview()
+            when (val result = saveReviewUseCase(review)) {
+                is ReviewResult.Success -> {
+                    val reviewId = result.data
+                    _uiEvent.emit(ReviewFormUiEvent.NavigateToDetail(reviewId))
+                }
 
-                    ReviewResult.Error -> {
-                        _uiState.update {
-                            it.copy(
-                                overlay = Overlay.None,
-                                userMessage = R.string.msg_review_save_failed
-                            )
-                        }
-                    }
+                ReviewResult.Error -> {
+                    showSnackbar(R.string.msg_review_save_failed)
                 }
             }
         }
@@ -164,25 +154,16 @@ class ReviewFormViewModel @Inject constructor(
                 }
             }
 
-            is SearchVideoResult.EmptyQuery -> _uiState.update {
-                it.copy(
-                    overlay = Overlay.None,
-                    userMessage = R.string.msg_title_required
-                )
+            is SearchVideoResult.EmptyQuery -> {
+                showSnackbar(R.string.msg_title_required)
             }
 
-            is SearchVideoResult.EmptyResult -> _uiState.update {
-                it.copy(
-                    overlay = Overlay.None,
-                    userMessage = R.string.msg_search_empty
-                )
+            is SearchVideoResult.EmptyResult -> {
+                showSnackbar(R.string.msg_search_empty)
             }
 
-            is SearchVideoResult.Error -> _uiState.update {
-                it.copy(
-                    overlay = Overlay.None,
-                    userMessage = R.string.msg_network_unstable
-                )
+            is SearchVideoResult.Error -> {
+                showSnackbar(R.string.msg_network_unstable)
             }
         }
     }
@@ -205,21 +186,13 @@ class ReviewFormViewModel @Inject constructor(
             }
 
             VideoDetailResult.Error -> {
-                _uiState.update {
-                    it.copy(overlay = Overlay.None, userMessage = R.string.msg_network_unstable)
-                }
+                showSnackbar(R.string.msg_network_unstable)
             }
         }
     }
 
     private fun searchBooks() {
         // todo kakao api
-    }
-
-    private fun removeSnackbarMessage() {
-        _uiState.update {
-            it.copy(userMessage = null)
-        }
     }
 
     private fun backStack() = viewModelScope.launch {
@@ -289,6 +262,13 @@ class ReviewFormViewModel @Inject constructor(
             it.copy(images = it.images.toMutableList().apply {
                 removeAt(index)
             })
+        }
+    }
+
+    private suspend fun showSnackbar(messageId: Int) {
+        _uiEvent.emit(ReviewFormUiEvent.ShowSnackbar(messageId))
+        _uiState.update {
+            it.copy(overlay = Overlay.None)
         }
     }
 }

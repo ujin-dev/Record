@@ -9,7 +9,6 @@ sealed interface ReviewFormUiAction {
     data object SaveClicked : ReviewFormUiAction
     data object BookmarkSelectorClicked : ReviewFormUiAction
     data object SearchClicked : ReviewFormUiAction
-    data object ShownSnackbarMessage : ReviewFormUiAction
 
     data class FieldChanged(val field: ReviewFormField, val value: String) : ReviewFormUiAction
     data class TypeChanged(val type: ReviewType) : ReviewFormUiAction

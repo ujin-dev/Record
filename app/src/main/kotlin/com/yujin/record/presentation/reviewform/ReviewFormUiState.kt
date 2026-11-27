@@ -9,7 +9,6 @@ import kotlin.time.Instant
 
 data class ReviewFormUiState(
     val overlay: Overlay = Overlay.None,
-    val userMessage: Int? = null,
 
     val id: Long = 0,
     val title: String = "",
