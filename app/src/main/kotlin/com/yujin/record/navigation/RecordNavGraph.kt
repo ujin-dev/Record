@@ -50,8 +50,8 @@ fun RecordNavGraph(
                 onBackClick = navController::popBackStack,
                 onDelete = {
                     navController.navigate(RecordRoute.Calendar) {
-                        popUpTo(navController.graph.id) {
-                            inclusive = true
+                        popUpTo(RecordRoute.Calendar) {
+                            inclusive = false
                         }
                         launchSingleTop = true
                     }
