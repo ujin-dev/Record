@@ -22,22 +22,24 @@ fun RatingBar(
     onRatingChange: (Float) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    fun updateRating(x: Float, width: Int) {
+        val starWidth = width / 5f
+        val index = (x / starWidth).toInt().coerceIn(0, 4)
+        // 0f ~ 1f
+        val fraction = (x - index * starWidth) / starWidth
+        onRatingChange(index + if (fraction < 0.5f) 0.5f else 1f)
+    }
+
     Row(
         modifier = modifier
-            .pointerInput(Unit) {
+            .pointerInput(onRatingChange) {
                 detectTapGestures { point ->
-                    val starWidth = size.width / 5f
-                    val index = (point.x / starWidth).toInt().coerceIn(0, 4)
-                    val fraction = (point.x - index * starWidth) / starWidth
-                    onRatingChange(index + if (fraction < 0.5f) 0.5f else 1f)
+                    updateRating(point.x, size.width)
                 }
             }
-            .pointerInput(Unit) {
+            .pointerInput(onRatingChange) {
                 detectHorizontalDragGestures { change: PointerInputChange, _ ->
-                    val starWidth = size.width / 5f
-                    val index = (change.position.x / starWidth).toInt().coerceIn(0, 4)
-                    val fraction = (change.position.x - index * starWidth) / starWidth
-                    onRatingChange(index + if (fraction < 0.5f) 0.5f else 1f)
+                    updateRating(change.position.x, size.width)
                     change.consume()
                 }
             },
