@@ -35,6 +35,7 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.trace
 import com.yujin.record.R
 import com.yujin.record.presentation.calendar.component.CalendarPager
 import com.yujin.record.presentation.calendar.component.EmptyReviewRow
@@ -48,7 +49,7 @@ import com.yujin.record.ui.theme.Dimens
 fun CalendarScreen(
     uiState: CalendarUiState,
     onAction: (CalendarUiAction) -> Unit,
-) {
+) = trace("CalendarScreen") {
     val handlerHeight = 48.dp
     val minContentHeight = 72.dp
     val sheetPeekHeight = handlerHeight + minContentHeight

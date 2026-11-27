@@ -21,6 +21,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.trace
 import coil3.compose.AsyncImage
 import com.yujin.record.ui.theme.Dimens
 
@@ -32,7 +33,7 @@ fun CalendarCell(
     thumbnailUri: Uri? = null,
     reviewCount: Int = 0,
     onClick: () -> Unit = {}
-) {
+) = trace("CalendarCell") {
     Box(
         modifier = modifier
             .clip(shape = RoundedCornerShape(Dimens.imageCornerSize))

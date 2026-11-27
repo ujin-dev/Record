@@ -60,7 +60,7 @@ fun CalendarPager(
     HorizontalPager(
         state = pagerState,
         modifier = modifier,
-        beyondViewportPageCount = 11,
+        beyondViewportPageCount = 0,
         verticalAlignment = Alignment.Top,
     ) { page ->
         val month = anchorYearMonth.plus(page - BASE_PAGE, DateTimeUnit.MONTH)

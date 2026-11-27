@@ -19,3 +19,6 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+#  Hilt 내부 참조. Error Prone 어노테이션은 컴파일 타임 전용
+-dontwarn com.google.errorprone.annotations.CanIgnoreReturnValue
