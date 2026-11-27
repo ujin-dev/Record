@@ -34,7 +34,7 @@ private data class CalendarMonthData(
 fun CalendarGrid(
     month: YearMonth,
     state: Map<LocalDate, CalendarCellUiState>? = null,
-    selectedDate: LocalDate,
+    selectedDay: Int?,
     onAction: (CalendarUiAction) -> Unit,
 ) = trace("CalendarGrid") {
     val monthDate = remember(month) {
@@ -76,7 +76,7 @@ fun CalendarGrid(
                         CalendarCell(
                             modifier = cellModifier,
                             date = localDate.day,
-                            isSelected = localDate == selectedDate,
+                            isSelected = localDate.day == selectedDay,
                             thumbnailUri = cellState?.thumbnailUrl,
                             reviewCount = cellState?.reviewCount ?: 0,
                             onClick = { onAction(CalendarUiAction.DateClicked(localDate)) },

@@ -68,7 +68,9 @@ fun CalendarPager(
         CalendarGrid(
             month = month,
             state = if (state.displayedYearMonth == month) state.cellStatesByDate else null,
-            selectedDate = selectedDate,
+            selectedDay = selectedDate
+                .takeIf { it.year == month.year && it.month == month.month }
+                ?.day,
             onAction = onAction,
         )
     }
